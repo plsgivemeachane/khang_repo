@@ -22,4 +22,15 @@ const clientLayout = async (req, res, next) => {
   next();
 };
 
-module.exports = clientLayout;
+const authLayout = (req, res, next) => {
+  // const user = req.user;
+  // // console.log(' authLayout ~ user:', user);
+  // if (user) return res.redirect('/');
+  res.locals.layout = 'layout/auth.ejs';
+  next();
+};
+
+module.exports = {
+  clientLayout,
+  authLayout,
+};

@@ -1,7 +1,8 @@
 const {Sequelize} = require("sequelize")
 const sequelize = new Sequelize('khang', 'root', '', {
     host: 'localhost',
-    dialect: 'mysql'
+    dialect: 'mysql',
+    logging: false
 })
 const database=async()=>{
     try {

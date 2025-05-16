@@ -16,7 +16,7 @@ const payment =async (req, res) => {
         amount: Number(payment_value),
         description: "userId" + userId + "nap tien"+Math.floor(Math.random() * 1000),
         orderCode:Math.floor(Math.random() * 100),
-        returnUrl: domain+"/payment/success",
+        returnUrl: domain+"/nap-tien/thanh-cong",
         cancelUrl: domain
     }
     const paymentLink = await payos.createPaymentLink(order);

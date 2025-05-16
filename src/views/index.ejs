@@ -1,1 +1,18 @@
-<h1>Hello</h1>
+<div class="content-homepage">
+<% if(accgame) {%>
+    <!-- for each -->
+   <div class="row justify-content-center">
+    <% accgame.forEach(function(item) { %>
+        
+            <%- include("./accgame/card.ejs",{image:item.image,name:item.name,price:item.price}) %>
+        
+    <% }); %>
+   </div>
+    <!-- end for each -->
+<% } %>
+</div>
+<style>
+    .content-homepage{
+        padding-top: 200px;
+    }
+</style>

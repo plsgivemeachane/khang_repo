@@ -12,15 +12,18 @@ const login = (req, res) => {
 };
 const registerAuth = async (req, res) => {
   const {username, email, password, phoneNumber} = req.body;
+  const getUserRole = await db.Role.findOne({where:{name:'user'}});
+  const userRoleId = getUserRole.id
   const hashPassword = await bcrypt.hash(password, 10);
   try {
     await db.User.create({
       username,
       email,
       password: hashPassword,
-      phoneNumber
+      phoneNumber,
+      roleId: userRoleId
     });
-    res.redirect('/auth/login');
+    res.redirect('/tai-khoan/dang-nhap');
   } catch (error) {
     console.log(" registerAuth ~ error:", error)
     res.render('auth/register');

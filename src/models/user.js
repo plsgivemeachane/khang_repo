@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.belongsTo(models.Role, {
+        foreignKey: 'roleId',
+        as: 'role',
+      });
+      User.hasMany(models.Payment, {
+        foreignKey: 'userId',
+        as: 'payments',
+      })
     }
   }
   User.init({
@@ -19,7 +27,12 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,
-    asset: DataTypes.INTEGER
+    asset: DataTypes.INTEGER,
+    avatar: DataTypes.STRING,
+    roleId: DataTypes.INTEGER,
+    status: DataTypes.BOOLEAN,
+    bio: DataTypes.STRING,
+    SOCAL_MEDIA:DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

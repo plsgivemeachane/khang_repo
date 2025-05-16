@@ -1,0 +1,84 @@
+<div class="py-4">
+    <h1 class="text-primary text-center">Tạo sản phẩm</h1>
+    <form
+      action="/admin/danh-muc/tao-danh-muc"
+      method="POST"
+      class="mt-4 w-75 mx-auto"
+      autocomplete="off"
+      
+      
+    >
+      <div class="row">
+        <!-- Tên sản phẩm -->
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Tên danh mục</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nhập tên danh mục"
+              name="name"
+              
+            />
+          </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label">Mô tả</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Nhập mô tả"
+                name="description"
+              />
+            </div>
+          </div>
+      </div>
+  
+      <div class="row">
+        <!-- Giá bán -->
+      
+  
+   
+      <!-- Danh mục & Thương hiệu -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Danh mục cha</label>
+            <select name="parent_id" class="form-select">
+                <option value="" disabled selected>--Danh mục--</option>
+                <% if (categories && categories.length > 0) { %>
+                    <%= selectTree(categories, 1) %>
+                <% } %>
+            </select>
+            
+            <% function selectTree(items, level = 1, parent_id =null) { %>
+                <% items.forEach(item => { %>
+                    <% let prefix = "--".repeat(level); %>
+                    <option value="<%= item.id %>" <%= item.id == parent_id ? "selected" : "" %>>
+                        <%= prefix + item.name %>
+                    </option>
+                    <% if (item.children && item.children.length > 0) { %>
+                        <%= selectTree(item.children, level + 1, parent_id) %>
+                    <% } %>
+                <% }); %>
+            <% } %>
+            
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Trạng thái</label>
+          <input type="checkbox" name="status" checked class="toogle-check">
+          </div>
+        </div>
+      </div>
+  
+      <!-- Hình ảnh -->
+    
+  
+      <button type="submit" class="btn btn-success">Tạo danh mục</button>
+    </form>
+  </div>
+ 
+  

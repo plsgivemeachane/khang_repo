@@ -1,0 +1,61 @@
+<div class="py-4">
+    <h1 class="text-primary text-center">Sửa sản phẩm</h1>
+    <form
+      action="/admin/danh-muc/sua-danh-muc/<%= data.id %>"
+      method="POST"
+      class="mt-4 w-75 mx-auto"
+      autocomplete="off"
+    >
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Tên danh mục</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nhập tên danh mục"
+              name="name"
+              value="<%= data.name %>"
+            />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Mô tả</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nhập mô tả"
+              name="description"
+              value="<%= data.description %>"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Danh mục cha</label>
+            <select name="parent_id" class="form-select">
+                <option value="" <%= !data.parent_id ? "selected" : "" %>>--Danh mục--</option>
+                <% function renderOptions(categories, level = 0) { %>
+                  <% categories.forEach(category => { %>
+                    <option value="<%= category._id %>" <%= data.parent_id && category.id == data.parent_id ? "selected" : "" %>>
+                      <%= "--".repeat(level) %><%= category.name %>
+                    </option>
+                    <% if (category.children && category.children.length > 0) { %>
+                      <% renderOptions(category.children, level + 1); %>
+                    <% } %>
+                  <% }); %>
+                <% } %>
+                <% renderOptions(categories); %>
+              </select>
+          </div>
+        </div>
+      
+      </div>
+
+      <button type="submit" class="btn btn-success">Sửa danh mục</button>
+    </form>
+</div>

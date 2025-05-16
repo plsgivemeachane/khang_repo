@@ -1,0 +1,38 @@
+<div class="">
+    <h1 class="text-center text-2xl text-primary">Danh sách danh mục</h1>
+    <% if(categories && categories.length > 0) { %>
+    <div class="mt-4">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tên danh mục</th>
+            <th scope="col">Danh mục cha</th>
+            
+            <th scope="col">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+         <% categories.forEach((category, index) => { %>
+          <tr>
+              <th scope="row"><%= index + 1 %></th>
+              <td><%= category.name %></td>
+              <td><%= category.parent_name %></td>
+             
+              <td>
+                <button class="btn btn-primary">
+                  <a href="/admin/category/update/<%= category._id %>" class="text-white text-decoration-none">
+                      Sửa
+                  </a>
+                </button>
+                <button class="btn btn-danger">Delete</button>
+              </td>
+            </tr>
+          <% }) %>
+      
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+  

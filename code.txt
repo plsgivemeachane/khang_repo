@@ -1,0 +1,26 @@
+
+      <!-- Danh mục & Thương hiệu -->
+      <!-- <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Danh mục cha</label>
+            <select name="category_id" class="form-select">
+                <option value="" disabled selected>--Danh mục--</option>
+                <% if (categories && categories.length > 0) { %>
+                    <%= selectTree(categories, 1) %>
+                <% } %>
+            </select>
+            
+            <% function selectTree(items, level = 1, parent_id = "") { %>
+                <% items.forEach(item => { %>
+                    <% let prefix = "--".repeat(level); %>
+                    <option value="<%= item.id %>" <%= item.id == parent_id ? "selected" : "" %>>
+                        <%= prefix + item.name %>
+                    </option>
+                    <% if (item.children && item.children.length > 0) { %>
+                        <%= selectTree(item.children, level + 1, parent_id) %>
+                    <% } %>
+                <% }); %>
+            <% } %>
+            
+          </div> -->

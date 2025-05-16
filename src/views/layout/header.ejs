@@ -1,11 +1,37 @@
-<header>
-    <% if (user) { %>
-        <span>Hi, <%=user.username %></span>
-        <span>số dư: <%=user.asset %></span>
-        <a href="/payment/nap-tien">Nạp tiền</a>
-        <a href="/auth/logout">Logout</a>
-    <% } else { %>
-        <a href="/auth/login">Login</a>
-        <a href="/user/register">Register</a>
-    <% } %>
+<header class="th-header sticky">
+    <div class="container">
+        <div class="row align-items-center justify-content-between">
+            <div class="col-auto">
+                <div class="header-logo">
+                    <a href="/">
+                        <span class="logo-mask bg-mask" style="mask-image: url(&quot;assets/img/logo-white.svg&quot;);"></span>
+                        <img src="assets/img/logo-white.svg" alt="Logo">
+                    </a>
+                </div>
+            </div>
+            <div class="col-auto">
+                <nav class="main-menu onepage-nav mobile-menu-active" style="">
+                    <ul>
+                        <li><a href="/">Trang chủ</a></li>
+                        <li id="hover-menu"><a href="#">Dịch vụ game</a>
+                                <ul class="submenu-header">
+                                    <li>Tool game</li>
+                                    <li>Acc FF</li>
+                                </ul>
+                        </li>
+                        <!-- <li><a href="#responsive">Responsive Demos</a></li>
+                        <li><a href="#features">Theme Features</a></li> -->
+                    </ul>
+                </nav>
+                <button class="th-menu-toggle d-inline-block d-lg-none">☵</button>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+                <div class="header-btn d-none d-md-block">
+                    <a target="_blank" href="/tai-khoan/dang-nhap" class="th-btn">Đăng nhập</a>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
 </header>

@@ -1,0 +1,173 @@
+<div class="py-4">
+    <h1 class="text-primary text-center">Đăng acc game</h1>
+    <form
+      action="/acc-game/create"
+      method="POST"
+      class="mt-4 w-75 mx-auto"
+      autocomplete="off"
+      enctype="multipart/form-data"
+      id="product-form"
+    >
+      <div class="row">
+        <!-- Tên sản phẩm -->
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Tên acc</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nhập tên acc"
+              name="name"
+              required
+            />
+          </div>
+        </div>
+     <!-- Danh mục & Thương hiệu -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Danh mục cha</label>
+            <select name="category_id" class="form-select">
+                <option value="" disabled selected>--Danh mục--</option>
+                <% if (categories && categories.length > 0) { %>
+                    <%= selectTree(categories, 1) %>
+                <% } %>
+            </select>
+            
+            <% function selectTree(items, level = 1, parent_id = null) { %>
+                <% items.forEach(item => { %>
+                    <% let prefix = "--".repeat(level); %>
+                    <option value="<%= item.id %>" <%= item.id == parent_id ? "selected" : "" %>>
+                        <%= prefix + item.name %>
+                    </option>
+                    <% if (item.children && item.children.length > 0) { %>
+                        <%= selectTree(item.children, level + 1, parent_id) %>
+                    <% } %>
+                <% }); %>
+            <% } %>
+            
+          </div>
+        <!-- Giá gốc -->
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Giá bán</label>
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Nhập giá"
+              name="price"
+              min="0"
+              required
+            />
+          </div>
+        </div>
+      </div>    
+  </div>
+  <div class="row">
+    <div class="col">
+      
+  
+      <div class="form-group mb-3">
+        <label class="form-label">Mô tả</label>
+        
+            <textarea class="form-control decs_textarea" name="description"></textarea>
+      </div>
+    </div>
+  </div>
+      <!-- Hình ảnh -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Ảnh chính</label>
+            <input
+              type="file"
+              class="form-control"
+              name="image"
+              id="main-image"
+              accept="image/*"
+            />
+            <img
+              id="preview-main"
+              class="preview-image mt-2 d-none"
+              width="100"
+            />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Ảnh phụ</label>
+            <input
+              type="file"
+              class="form-control"
+              name="list_image"
+              multiple
+              accept="image/*"
+              id="sub-images"
+            />
+            <div id="preview-sub" class="d-flex flex-wrap mt-2"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+            <label for="" class="form-label">Trạng thái acc</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="status" id="active" value="1" checked>
+                <label class="form-check-label" for="active">Đã bán</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="status" id="inactive" value="0">
+                <label class="form-check-label" for="inactive">Chưa bán</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label for="" class="form-label">Phương thức đăng nhập</label>
+            <select name="method_login" id="" class="form-select">
+                <option value="" disabled selected>--Phương thức--"</option>
+                <option value="google">Google</option>
+                <option value="facebook">Facebook</option>
+                <option value="username_and_password">Tài khoản và mật khẩu</option>
+                <option value="more">Khác</option>
+            </select>
+        </div>
+      </div>   
+      <div class="row">
+        <div class="col-md-6 d-flex">
+          <label for="" class="form-label">Liên hệ</label>
+          <select name="contactid=" id="socal_media" class="form-select">
+            <option value="" disabled selected>--Liên hệ--"</option>
+            <option value="facebook">Facebook</option>
+
+           <option value="zalo">Zalo</option>
+           
+          </select>
+          <input type="text" name="social_media" id="contact" class="form-control ms-2 d-none">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-success btn-submit">Tạo sản phẩm</button>
+    </form>
+  </div>
+  <script>
+    const socalMedia = document.querySelector('#socal_media');
+   
+socalMedia.addEventListener("change", function(e) {
+  const value = e.target.value;
+  contact.classList.remove('d-none');
+
+  if (value === 'facebook') {
+    // Nếu input chưa có prefix thì gán
+    if (!contact.value.startsWith('https://facebook.com/')) {
+      contact.value = 'https://facebook.com/';
+    }
+    contact.placeholder = 'Nhập đường dẫn Facebook';
+  } else if (value === 'zalo') {
+    contact.value = '';
+    contact.placeholder = 'Nhập số Zalo';
+  } else {
+    contact.value = '';
+    contact.classList.add('d-none');
+  }
+});
+
+    
+  </script>

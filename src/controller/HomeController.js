@@ -1,5 +1,8 @@
-const index = (req, res) => {
-    res.render("index");
+const db = require("../models");
+const index =async (req, res) => {
+    const accgame = await db.AccGame.findAll({});
+    console.log(" index ~ accgame:", accgame)
+    res.render("index",{accgame});
 }
 const test = (req, res) => {
     res.render("test");
