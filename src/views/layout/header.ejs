@@ -1,0 +1,11 @@
+<header>
+    <% if (user) { %>
+        <span>Hi, <%=user.username %></span>
+        <span>số dư: <%=user.asset %></span>
+        <a href="/payment/nap-tien">Nạp tiền</a>
+        <a href="/auth/logout">Logout</a>
+    <% } else { %>
+        <a href="/auth/login">Login</a>
+        <a href="/user/register">Register</a>
+    <% } %>
+</header>
