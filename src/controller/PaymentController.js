@@ -10,20 +10,22 @@ const paymentSuccess = async (req, res) => {
 };
 const payment =async (req, res) => {
     const { payment_value } = req.body;
-    console.log(" payment ~ payment_value:", payment_value)
+    const date = new Date();
+    console.log(" payment ~ date:", date)
+    const getDateToilisecond = date.getTime();
     const userId = req.user.id
     const order ={
         amount: Number(payment_value),
-        description: "userId" + userId + "nap tien"+Math.floor(Math.random() * 1000),
-        orderCode:Math.floor(Math.random() * 100),
+        description: "userId" + userId + "nap tien",
+        orderCode:getDateToilisecond,
         returnUrl: domain+"/nap-tien/thanh-cong",
         cancelUrl: domain
     }
     const paymentLink = await payos.createPaymentLink(order);
-    console.log(" payment ~ paymentLink:", paymentLink)
     res.redirect(303, paymentLink.checkoutUrl);
+    
 
-    if(paymentLink.status === "PENDING") {
+    if(paymentLink.status == "PENDING") {
         await db.Payment.create({
             userId: userId,
             payment_content: "nap tien",

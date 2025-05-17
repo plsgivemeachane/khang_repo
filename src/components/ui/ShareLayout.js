@@ -4,6 +4,7 @@ const clientLayout = async (req, res, next) => {
   const userId = req?.user?.id;
 
   // ✅ Nếu không có userId (chưa đăng nhập), bỏ qua truy vấn
+  
   if (!userId) {
     res.locals.layout = 'layout/client.ejs';
     res.locals.user = null;

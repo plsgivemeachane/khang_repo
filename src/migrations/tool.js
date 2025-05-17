@@ -2,54 +2,43 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Tools', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      username: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      phoneNumber: {
+      description: {
         type: Sequelize.STRING,
       },
-      asset: {
+    
+      image: {
+        type: Sequelize.STRING,
+      },
+      list_image: {
+        type: Sequelize.JSON,
+      },
+      price: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      avatar: {
-        type: Sequelize.STRING,
-        defaultValue: "https://cdn-icons-png.flaticon.com/512/5804/5804911.png",
-      },
-      roleId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Roles',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL', // hoặc 'RESTRICT' hoặc 'CASCADE' tùy logic
       },
       status: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true,
       },
-      bio: {
-        type: Sequelize.STRING,
+      
+      category_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Categories',
+          key: 'id',
+        },
       },
-      SOCAL_MEDIA: {
+    
+      key_value: {
         type: Sequelize.STRING,
       },
       createdAt: {
@@ -62,8 +51,7 @@ module.exports = {
       },
     });
   },
-
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Tools');
   },
 };

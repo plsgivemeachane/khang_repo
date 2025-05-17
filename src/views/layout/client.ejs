@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
-    <!-- Slick Slider -->
-    <link rel="stylesheet" href="/assets/css/slick.min.css" />
-    <!-- Fontawesome Icon -->
-    <link rel="stylesheet" href="/assets/css/fontawesome.min.css" />
-    <!-- Theme Custom CSS -->
-    <link rel="stylesheet" href="/assets/css/client.css" />
-  </head>
+   <head>
+    <meta charset="utf-8">
+    <title><%= title || 'TeamHost - Join now and play mighty games!' %></title>
+
+    <meta content="Templines" name="author">
+    <meta content="TeamHost" name="description">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="format-detection" content="telephone=no">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/libs.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/fonts/simple-line-icons/css/simple-line-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet">
+    <script src="assets/js/libs.js"></script>
+    <script src="assets/js/main.js"></script>
+
+
+</head>
   <body>
+    <div class="page-wrapper">
     <%- include('./header.ejs') %> <%- body %>
-    <div class="form-group style-border2 col-md-6"><input type="text" class="form-control" name="name" id="name" placeholder="Your Name"> <i class="fal fa-user"></i></div>
+    <div class="page-content">
+      <%- include('./sidebar.ejs') %>
+      <main class="page-main">
+        <%- body %>
+      </main>
+    </div>
+    </div>
 
   </body>
   
   
-  <script src="./assets/js/vendor/jquery-3.7.1.min.js"></script>
-  <!-- Bootstrap -->
-  <script src="./assets/js/client/bootstrap.min.js"></script>
-  <!-- Isotop -->
-  <script src="./assets/js/client/isotope.pkgd.min.js"></script>
-  <!-- Slick Slider -->
-  <script src="./assets/js/client/slick.min.js"></script>
-  <!-- Mobile Menu -->
-  <script src="./assets/js/client/asmenu.min.js"></script>
-  <!-- Main Js File -->
-  <script src="./assets/js/client/main.js"></script>
+ 
 </html>

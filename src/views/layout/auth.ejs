@@ -1,28 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <title>Chưa biết điền chi</title>
+    <meta content="Templines" name="author" />
+    <meta content="TeamHost" name="description" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
-    <!-- Slick Slider -->
-    <link rel="stylesheet" href="/assets/css/slick.min.css" />
-    <!-- Fontawesome Icon -->
-    <link rel="stylesheet" href="/assets/css/fontawesome.min.css" />
-    <!-- Theme Custom CSS -->
-    <link rel="stylesheet" href="/assets/css/client.css" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <link
+      rel="shortcut icon"
+      href="/assets/img/favicon.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="/assets/css/libs.min.css" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="/assets/fonts/simple-line-icons/css/simple-line-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap"
+      rel="stylesheet"
+    />
+    <script src="/assets/js/libs.js"></script>
+    <script src="/assets/js/main.js"></script>
   </head>
+
   <body>
-    <!-- Login 6 - Bootstrap Brain Component -->
-    <section class="bg-primary p-3 p-md-4 p-xl-5" style="height: 100vh">
-      <a href="/" class="btn btn-light text-primary fw-bold">Trang chủ</a
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-12 col-md-9 col-lg-7 col-xl-6 col-xxl-5">
-            <div class="card border-0 shadow-sm rounded-4"><%- body %></div>
-          </div>
-        </div>
+    <!-- Loader-->
+    <div id="page-preloader">
+      <div class="preloader-1">
+        <div class="loader-text">Loading</div>
+        <span class="line line-1"></span>
+        <span class="line line-2"></span>
+        <span class="line line-3"></span>
+        <span class="line line-4"></span>
+        <span class="line line-5"></span>
+        <span class="line line-6"></span>
+        <span class="line line-7"></span>
+        <span class="line line-8"></span>
+        <span class="line line-9"></span>
       </div>
-    </section>
+    </div>
+    <!-- Loader end-->
+
+    <%- body %>
   </body>
-  
+  <style>
+    .input-password{
+        display: flex;
+    }
+    .show-password{
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+  </style>
+  <script
+  src="https://kit.fontawesome.com/9315bcbe73.js"
+  crossorigin="anonymous"
+></script>
+<script>
+    const showPassword = document.querySelectorAll('.show-password');
+    showPassword.forEach(item => {
+        item.addEventListener('click', () => {
+            const input = item.parentElement.querySelector('input');
+            if(input.getAttribute('type') === 'password'){
+                input.setAttribute('type', 'text');
+                // rename fa-eye to fa-eye-slash
+                item.classList.replace('fa-eye', 'fa-eye-slash');
+            }else{
+                input.setAttribute('type', 'password');
+                // rename fa-eye-slash to fa-eye
+                item.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        })
+    })
+        
+    
+</script>
+</html>

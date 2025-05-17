@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
           foreignKey: 'parent_id',
           as: 'category',
         });
+        Category.hasMany(models.Tool, {
+          foreignKey: 'categoryId',
+          as: 'tool',
+        })
     }
   }
   Category.init(
