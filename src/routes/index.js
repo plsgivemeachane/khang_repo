@@ -4,6 +4,7 @@ const paymentRouter = require('./client/PaymentRouter');
 const accGameClientRouter = require('./client/AccGameClientRouter');
 const toolAdminRouter = require('./admin/ToolAdminRouter'); // Import toolRouter
 const CategoryAdminRouter = require('./admin/CategoryRouter');
+const orderRouter = require('./client/OrderRouter');
 const { decodedToken } = require('../service/jwt');
 const { authLayout } = require('../components/ui/ShareLayout');
 
@@ -15,6 +16,7 @@ module.exports = (app) => {
   app.use('/acc-game', decodedToken,accGameClientRouter);
   app.use('/admin/danh-muc', decodedToken, CategoryAdminRouter);
   app.use('/admin/tool-game',toolAdminRouter)
+  app.use("/order", orderRouter);
   app.use('/payment', decodedToken, paymentRouter);
   
 };
