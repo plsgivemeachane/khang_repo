@@ -1,0 +1,23 @@
+<div class="box-payment">
+    <form action="/thanh-toan/rut-tien" method="post">
+      <div class="form-group">
+        <label for="" class="form-label">Nhập số tiền cần nạp</label>
+        <input
+          type="number"
+          class="form-control"
+          name="payment_value"
+          min="5000"
+          max="10000000"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    
+  </div>
+  <style>
+    .box-payment{
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>

@@ -1,0 +1,44 @@
+<div>
+    <h1>Lịch sử mua key</h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Loại đơn hàng</th>
+            <th scope="col">Giá</th>
+            <th scope="col">Key</th>
+            <th scope="col">Thời gian</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (tools && tools.length > 0) { %>
+            <% tools.forEach((item, index) => { %>
+              <% item.keys.forEach((key, keyIndex) => { %>
+                <tr>
+                  <th scope="row"><%= index + 1 %></th>
+                  <td><%= item.toolName %></td>
+                  <td class="price-value"><%= item.price %></td>
+                  <td><%= key %></td>
+                  <td class="createdAt"><%= item.orderedAt %></td>
+                </tr>
+              <% }) %>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="5">Không có lịch sử mua key</td>
+            </tr>
+          <% } %>
+          </tbody>
+          
+      </table>
+</div>
+<script>
+    const formatPrice = document.querySelectorAll('.price-value');
+    formatPrice.forEach(price => {
+        price.innerHTML = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price.innerHTML);
+    })
+    const formatDate = document.querySelectorAll('.createdAt');
+    formatDate.forEach(date => {
+        date.innerHTML = new Date(date.innerHTML).toLocaleString();
+    })
+</script>

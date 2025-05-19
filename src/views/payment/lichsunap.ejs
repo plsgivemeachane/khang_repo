@@ -1,0 +1,46 @@
+<div>
+    <h1>Lịch sử nạp tiền</h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Số tiền nạp</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Thời gian</th>
+          </tr>
+        </thead>
+        <tbody>
+       <% if(payments){ %>
+          <% payments.forEach((payment, index) => { %>
+          <tr>
+            <th scope="row"><%= index + 1 %></th>
+            <td class="payment_value"><%= payment.payment_value %></td>
+            <td>
+                <% if(payment.status == 0){ %>
+                <span class="badge bg-danger">Chưa thanh cong</span>
+                <% } else { %>
+                <span class="badge bg-success p-3 text-white">Thành công</span>
+                <% } %>
+            </td>
+            <td class="createdAt"><%= payment.createdAt %></td>
+          </tr>
+          <% }) %>
+          <% } else { %>
+          <tr>
+            <td colspan="4">Không có lịch sử nạp tiền</td>
+          </tr>
+          <% } %>
+          
+        </tbody>
+      </table>
+</div>
+<script>
+    const formatPrice = document.querySelectorAll('.payment_value');
+    formatPrice.forEach(price => {
+        price.innerHTML = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price.innerHTML);
+    })
+    const formatDate = document.querySelectorAll('.createdAt');
+    formatDate.forEach(date => {
+        date.innerHTML = new Date(date.innerHTML).toLocaleString();
+    })
+</script>

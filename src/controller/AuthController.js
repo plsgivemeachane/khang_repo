@@ -2,14 +2,9 @@
 const db = require('../models/index');
 const { accessToken } = require('../service/jwt');
 const bcrypt = require('bcryptjs');
+const expCookie = 1000*60*60*24*30;// 30 days
 
-const register = (req, res) => {
-  res.render('auth/register');
-};
 
-const login = (req, res) => {
-  res.render('auth/login');
-};
 const registerAuth = async (req, res) => {
   const {username, email, password, phoneNumber} = req.body;
   const getUserRole = await db.Role.findOne({where:{name:'user'}});
@@ -23,10 +18,11 @@ const registerAuth = async (req, res) => {
       phoneNumber,
       roleId: userRoleId
     });
-    res.redirect('/tai-khoan/dang-nhap');
+    res.json({ message: 'Register successfully' });
+
   } catch (error) {
     console.log(" registerAuth ~ error:", error)
-    res.render('auth/register');
+    res.status(500).json({ message: 'Error' });
   }
 };
 const loginAuth = async (req, res) => {
@@ -48,16 +44,14 @@ const loginAuth = async (req, res) => {
     // console.log('loginPost ~ access_token:', access_token);
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      maxAge:60*1000*30, //
+      maxAge: expCookie, //
     });
-    res.redirect('/');
+    res.status(200).json({ message: 'Login successfully' });
   } catch (error) {
-    res.send('Error');
+    res.status(500).json({ message: 'Error' });
   }
 };
 module.exports = {
-  register,
-  login,
   registerAuth,
   loginAuth,
 };

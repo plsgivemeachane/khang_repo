@@ -7,5 +7,6 @@ const {checkAuth} = require("../../middleware/checkAuth");
 router.get("/nap-tien",checkAuth, controller.naptien);
 router.post("/nap-tien",controller.payment);
 router.get("/nap-tien/thanh-cong",controller.paymentSuccess);
+router.get("/lich-su-nap-tien",checkAuth, controller.lichsunap);
 
 module.exports = router;

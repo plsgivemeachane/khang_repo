@@ -1,0 +1,47 @@
+
+  .delete-btn-confirm.loading {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .delete-btn-confirm.loading::after {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spinner 0.6s linear infinite;
+  }
+  
+  .loading {
+    width: 40px !important;
+    height: 40px !important;
+    border: 2px solid #f3f3f3 !important;
+    border-radius: 50%;
+    border-top-color: #3498db !important;
+    position: absolute !important;
+    top: calc(50% - 20px) !important;
+    left: calc(50% - 20px) !important;
+    animation: spinner 0.6s linear infinite !important;
+  }
+  @keyframes spinner {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+
+  .list-button-top-table {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .select-sort {
+    width: 200px;
+  }
+  .sort-product {
+    /* pointer-events: none; */
+    cursor: pointer;
+  }
+  

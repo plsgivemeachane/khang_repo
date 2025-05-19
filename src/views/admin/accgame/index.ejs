@@ -1,0 +1,80 @@
+<%- include("../../../components/ui/ejs/Toasty.ejs") %> <% if(data){ %>
+    <div class="table-responsive">
+     
+      <div class="mb-3 list-button-top-table">
+        <div class="d-flex gap-2 gap-md-4 align-items-center sort">
+          <select id="" class="form-select select-sort" sort-select>
+            <option value="" disabled selected>---Sắp xếp---</option>
+            <option value="name-asc">Sắp xếp theo tên A-Z</option>
+            <option value="name-desc">Sắp xếp theo tên Z-A</option>
+            <option value="createAt-asc">Sắp xếp theo thời gian tạo sớm nhất</option>
+            <option value="createAt-desc">Sắp xếp theo thời gian tạo muốn nhất</option>
+            <option value="price_origin-asc">Sắp xếp theo giá thấp đến cao</option>
+            <option value="price_origin-desc">Sắp xếp theo giá cao đến thấp</option>
+          </select>
+          <button class="btn btn-danger" id="reset">X</button>
+    
+        </div>
+        <button type="button" class="btn btn-primary">
+          <a href="/admin/acc-game/dang-acc" class="text-white text-decoration-none"
+            >➕ Thêm</a
+          >
+        </button>
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Ảnh</th>
+            <th>Tên</th>
+            <th>Giá </th>
+            <th>Danh mục</th>
+            <th>Tác giả</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="sortable">
+          <% data.forEach((item, index) => { %>
+          <tr data-id="<%= item.id %>">
+            <th scope="row"><%= index + 1 %></th>
+            <td class="image-table">
+              <img src="<%= item.image %>" alt="<%= item.name %>" />
+            </td>
+            <td><%= item.name %></td>
+            <td><%= item.price %></td>
+            <td><%= item.category_name %></td>
+            <th><%= item.author %></th>
+          
+        
+            <td>
+            
+                <a href="/admin/acc-game/cap-nhat/<%= item.id %>" class="btn btn-primary mb-1">
+                  Sửa
+                </a>
+                        
+              <form
+                action="/admin/acc-game/xoa/<%= item.id %>?_method=DELETE"
+                method="post"
+              >
+                <button type="submit" class="btn btn-danger delete-btn-confirm">
+                  Xóa
+                </button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      
+    </div>
+    <% } %>
+    <style>
+      .image-table img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        display: block;
+        margin: auto;
+      }
+    </style>
+    

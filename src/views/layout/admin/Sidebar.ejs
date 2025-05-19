@@ -1,0 +1,74 @@
+<ul
+  class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+  id="accordionSidebar"
+>
+  <!-- Sidebar - Brand -->
+  <a
+    class="sidebar-brand d-flex align-items-center justify-content-center"
+    href="/"
+  >
+    <div class="sidebar-brand-icon rotate-n-15">
+      <i class="fas fa-laugh-wink fs-3"></i>
+    </div>
+    <div class="sidebar-brand-text mx-3">Admin Panel</div>
+  </a>
+
+  <!-- Divider -->
+  <hr class="sidebar-divider my-0" />
+
+  <!-- Nav Item - Dashboard -->
+  <li class="nav-item active">
+    <a class="nav-link" href="/">
+      <i class="fas fa-fw fa-tachometer-alt"></i>
+      <span>Dashboard</span>
+    </a>
+  </li>
+
+  <!-- Divider -->
+  <hr class="sidebar-divider" />
+
+  <!-- Heading -->
+  <div class="sidebar-heading">Pages</div>
+  <% MenuDashboard.forEach((item, index) => { %>
+    <li class="nav-item <%= item.subMenu.some(sm => sm.path === activePath) ? 'active' : '' %>">
+      <a
+        class="nav-link collapsed d-flex align-items-center justify-content-between item-sidebar-admin"
+        href="#"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapsePages<%= index %>"
+        aria-expanded="<%= item.subMenu.some(sm => sm.path === activePath) %>"
+        aria-controls="collapsePages<%= index %>"
+      >
+        <div class="item-sidebar-admin-show">
+          <i class="fas fa-fw fa-folder"></i>
+          <span><%= item.title %></span>
+        </div>
+        <% if (item.subMenu && item.subMenu.length > 0) { %>
+          <i class="fas fa-angle-down icon-sidebar-admin"></i>
+        <% } %>
+      </a>
+  
+      <div
+        id="collapsePages<%= index %>"
+        class="collapse <%= item.subMenu.some(sm => sm.path === activePath) ? 'show' : '' %>"
+        data-bs-parent="#accordionSidebar"
+      >
+        <div class="bg-white py-2 collapse-inner rounded">
+          <% item.subMenu.forEach((subItem) => { %>
+            <a class="collapse-item <%= subItem.path === activePath ? 'active' : '' %>" href="<%= subItem.path %>">
+              <span><%= subItem.title %></span>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    </li>
+  <% }) %>
+  
+  <!-- Divider -->
+  <hr class="sidebar-divider d-none d-md-block" />
+
+  <!-- Sidebar Toggler -->
+  <div class="text-center d-none d-md-inline">
+    <button class="rounded-circle border-0" id="sidebarToggle"></button>
+  </div>
+</ul>

@@ -1,0 +1,227 @@
+<header id="heading" class="">
+  <nav class="heading">
+    <div class="container c-container header-container">
+      <div class="box-logo">
+        <a href="/">
+          <img
+            src="//cdn3.upanh.info/upload/server-sw3/images/180%20-%20Cuoq%20-%2003_07_2024%20-%20Logo%20Campagin%20T6%20Shopbacgau.png"
+            alt="logo-shop"
+            class="d-lg-block d-none"
+          />
+          <img
+            src="//cdn3.upanh.info/upload/server-sw3/images/180%20-%20Cuoq%20-%2003_07_2024%20-%20Logo%20Campagin%20T6%20Shopbacgau.png"
+            alt="logo-shop-mob"
+            class="d-lg-none"
+          />
+        </a>
+      </div>
+      <div class="d-none d-lg-flex h-100">
+        <div class="box-menu c-mr-16 c-py-10">
+          <div class="box-menu-bar">
+            <div class="box-icon brs-8 c-mr-8">
+              <img src="/assets/image/nam/menu.svg" alt="menu" />
+            </div>
+            <span class="lh-40 box-icon-text fw-700">Danh mục</span>
+          </div>
+          <div class="menu-list" style="top: 64px">
+            <div class="menu-category">
+              <div class="container c-container">
+                <ul class="d-flex justify-content-between px-0">
+                  <li class="w-100 c-px-4">
+                    <a href="javascript:void(0)">
+                      <div
+                        class="c-p-8 brs-8 d-flex justify-content-center"
+                        style="white-space: nowrap"
+                      >
+                        <div>
+                          <img
+                            src="//cdn3.upanh.info/upload/server-sw3/images/home.png"
+                            alt="Trang chủ"
+                            class="c-pr-4"
+                          />
+                        </div>
+                        <span class="fw-500 fz-15 lh-24">Trang chủ</span>
+                      </div>
+                    </a>
+                  </li>
+
+                  <li class="w-100 c-px-4">
+                    <a href="/mua-acc">
+                      <div
+                        class="c-p-8 brs-8 d-flex justify-content-center"
+                        style="white-space: nowrap"
+                      >
+                        <div>
+                          <img
+                            src="//cdn3.upanh.info/upload/server-sw3/images/download%20(5).png"
+                            alt="Mua Acc"
+                            class="c-pr-4"
+                          />
+                        </div>
+                        <span class="fw-500 fz-15 lh-24">Mua Acc</span>
+                      </div>
+                    </a>
+                  </li>
+                  <li class="w-100 c-px-4">
+                    <a href="/dich-vu">
+                      <div
+                        class="c-p-8 brs-8 d-flex justify-content-center"
+                        style="white-space: nowrap"
+                      >
+                        <div>
+                          <img
+                            src="//cdn3.upanh.info/upload/server-sw3/images/download%20(5).png"
+                            alt="Dịch vụ"
+                            class="c-pr-4"
+                          />
+                        </div>
+                        <span class="fw-500 fz-15 lh-24">Dịch vụ</span>
+                      </div>
+                    </a>
+                  </li>
+                  <li class="w-100 c-px-4">
+                    <a href="/tin-tuc">
+                      <div
+                        class="c-p-8 brs-8 d-flex justify-content-center"
+                        style="white-space: nowrap"
+                      >
+                        <div>
+                          <img
+                            src="//cdn3.upanh.info/upload/server-sw3/images/z6032195102620_f04ebe7011547de7d7687ac88278dc9a.jpg"
+                            alt="Tin tức"
+                            class="c-pr-4"
+                          />
+                        </div>
+                        <span class="fw-500 fz-15 lh-24">Tin tức</span>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="box-viewed d-flex c-py-10">
+          <div class="box-icon brs-8 c-mr-8">
+            <img
+              src="/assets/image/viewed.png"
+              alt="viewed"
+              style="filter: invert(80%)"
+            />
+          </div>
+          <a href="/viewed" class="lh-40 box-icon-text fw-700">Đã xem</a>
+        </div>
+      </div>
+      <div class="box-search d-none d-lg-block">
+        <form class="form-search" id="formSearchHeader">
+          <input
+            type="search"
+            placeholder="Tìm kiếm"
+            class="has-submit"
+            id="search-header-input"
+          />
+          <button type="submit" id="btnSearch" title="Tìm kiếm"></button>
+          <div class="tooltip-search-hearder" id="input-search-header"></div>
+        </form>
+      </div>
+      <div class="d-flex">
+      <% if(user){ %>
+        <a
+        class="btn primary handle-recharge-modal pl-xl-4 pr-xl-4 pl-sm-1 pr-sm-1 c-ml-16 c-mr-16 d-none d-lg-block"
+        href="/thanh-toan/nap-tien"
+
+        >Nạp tiền</a
+      >
+      <% }%>
+        <div class="box-search_mobile d-lg-none" style="display: none">
+          <div class="box-notify-1">
+            <div class="box-icon brs-8">
+              <img src="/assets/image/nam/search.svg" alt="search" />
+            </div>
+          </div>
+        </div>
+        <div class="d-lg-none">
+          <div class="box-notify-1">
+            <div class="box-icon brs-8">
+              <a href="/viewed">
+                <img
+                  src="/assets/image/DA-XEM.png"
+                  alt="DA-XEM"
+                  style="
+                    position: absolute;
+                    top: 20px;
+                    right: 60px;
+                    width: 30px;
+                    height: 30px;
+                  "
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="box-notify d-flex">
+          <div class="box-icon brs-8" data-notity="">
+            <img src="/assets/image/nam/ring.svg" alt="ring" />
+            <p id="num-notification" class="d-none">0</p>
+          </div>
+          <div class="notify_menu notify_active position-absolute brs-12">
+            <div class="notify_header d-flex justify-content-between c-p-16">
+              <div class="fw-700 fz-20 lh-28 title-color">Thông báo</div>
+              <img
+                src="/assets/image/nam/profile_close.svg"
+                alt="profile_close"
+                class="close-notification-popup c-mr-12"
+              />
+            </div>
+            <div class="step noti_menu_mobile">
+              <div class="head-mobile">
+                <a href="javascript:void(0);" class="link-back close-step"></a>
+                <p class="head-title text-title">Thông báo</p>
+              </div>
+            </div>
+          </div>
+        <% if(user){ %>
+          <div class="user-info">
+            <div class="">
+              <strong><%=user.username%></strong>
+              <span id="user-asset">Số dư <%=user.asset%> VNĐ</span>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle custom-avt" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                <img src="<%=user.avatar%>" alt="">
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/thanh-toan/lich-su-nap-tien">Lich sử nạp</a>
+                <a class="dropdown-item" href="/don-hang/lich-su-mua">Lịch sử mua key</a>
+                <a class="dropdown-item" href="#">Lịch sử mua acc</a>
+                <a class="dropdown-item" href="#">Thông tin cá nhân</a>
+                <a class="dropdown-item" href="#">Rút tiền</a>
+                <% if(user.roleId == 1 || user.roleId == 3){ %>
+                <a class="dropdown-item" href="/admin">Đăng acc</a>
+                <a class="dropdown-item" href="#">Quản lý acc</a>
+
+                <% } %>
+                <% if(user.roleId == 1){ %>
+                  <a class="dropdown-item" href="/admin/dashboard">Quản lý</a>
+                  <% } %>
+                <a class="dropdown-item" href="#">Dăng xuất</a>
+
+
+              </div>
+            </div>
+          </div>
+          <% }else{ %>
+            <a
+            class="btn primary handle-recharge-modal pl-xl-4 pr-xl-4 pl-sm-1 pr-sm-1 c-ml-16 c-mr-16 d-none d-lg-block"
+            data-toggle="modal"
+            data-target="#exampleModal"
+            >Đăng nhập</a
+          >
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<%- include("../../auth/auth.ejs") %>

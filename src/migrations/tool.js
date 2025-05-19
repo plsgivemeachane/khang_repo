@@ -37,7 +37,9 @@ module.exports = {
           key: 'id',
         },
       },
-    
+      slug: {
+        type: Sequelize.STRING,
+      },
       key_value: {
         type: Sequelize.STRING,
       },

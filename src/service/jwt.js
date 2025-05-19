@@ -11,7 +11,7 @@ const accessToken = (payload) => {
 };
 const decodedToken = (req, res, next) => {
     const access_token = req.cookies.access_token;
-    // console.log('decodedToken ~ access_token:', access?_token);
+    console.log('decodedToken ~ access_token:', access_token);
   
     if (!access_token) {
       console.log('Không có token');

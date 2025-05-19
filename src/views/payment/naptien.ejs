@@ -1,9 +1,23 @@
-<form action="/payment/nap-tien" method="post">
+<div class="box-payment">
+  <form action="/thanh-toan/nap-tien" method="post">
     <div class="form-group">
-        <label class="form-label">Số tiền cần nạp</label>
-        <input type="number" class="form-control" name="payment_value" >
-        
+      <label for="" class="form-label">Nhập số tiền cần nạp</label>
+      <input
+        type="number"
+        class="form-control"
+        name="payment_value"
+        min="2000"
+        max="10000000"
+        required
+      />
     </div>
-    
     <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+  </form>
+  
+</div>
+<style>
+  .box-payment{
+    max-width: 500px;
+    margin: 0 auto;
+  }
+</style>

@@ -1,0 +1,77 @@
+<h1>Mua tool <%= tool.name %></h1>
+<input type="number" value="<%= tool.price %>" hidden id="toolPrice" />
+<h3 class="format-number" id="price">
+  Giá: <%= tool.price.toLocaleString('vi-VN') %> VNĐ
+</h3>
+
+<form id="buy-form">
+  <div class="form-group">
+    <label for="" class="form-label">Số lượng</label>
+    <input
+      type="number"
+      class="form-control"
+      name="quantity"
+      min="1"
+      max="100"
+      required
+    />
+  </div>
+
+  <input type="hidden" name="orderId" value="<%= tool.id %>" />
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<!-- jQuery + Script -->
+<script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/toastify-js"
+></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  const price = document.getElementById('price');
+  const quantityInput = document.querySelector('input[name="quantity"]');
+  const toolPrice = document.getElementById('toolPrice').value;
+
+  quantityInput.addEventListener('input', () => {
+    const quantity = parseInt(quantityInput.value || 1);
+    const total = toolPrice * quantity;
+    price.textContent = 'Giá: ' + total.toLocaleString('vi-VN') + ' VNĐ';
+  });
+
+  $('#buy-form').on('submit', function (e) {
+    e.preventDefault();
+
+    const payload = {
+      orderId: $('input[name="orderId"]').val(),
+      quantity: $('input[name="quantity"]').val(),
+    };
+
+    $.ajax({
+      url: '/don-hang/mua',
+      method: 'POST',
+      contentType: 'application/json', // Gửi JSON
+      data: JSON.stringify(payload),
+      success: function (response) {
+        alert('Đặt mua thành công!');
+      },
+      error: function (err) {
+        console.error(err);
+        const message =
+          err.responseJSON && err.responseJSON.message
+            ? err.responseJSON.message
+            : 'Có lỗi xảy ra, vui lòng thử lại.';
+
+        Toastify({
+          text: message,
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          style: {
+            background: '#f7462e',
+          },
+        }).showToast();
+      },
+    });
+  });
+</script>

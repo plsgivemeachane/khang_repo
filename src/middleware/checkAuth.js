@@ -1,4 +1,4 @@
-const db = require("../models");
+const db = require('../models');
 
 const checkAuth = (req, res, next) => {
   if (req.user) {
@@ -14,64 +14,66 @@ const checkPayment = async (req, res, next) => {
   orderId = Number(orderId);
   quantity = Number(quantity);
 
-  const checkToolOrderId = await db.Tool.findOne({ where: { id: orderId } });
-  const price = checkToolOrderId.price;
-
-  // Bước 1: Lấy key_value ban đầu và chuyển thành mảng
-  let keyList = checkToolOrderId.key_value?.split(',') || [];
-
-  // Bước 2: Lọc ra các key chưa dùng (không có "-true")
-  const availableKeys = keyList.filter(k => !k.endsWith('-true'));
-
-  // Nếu không đủ số lượng key thì báo lỗi
-  if (availableKeys.length < quantity) {
-    return res.send("Không đủ key để xử lý đơn hàng.");
+  if (!orderId || !quantity || quantity < 1) {
+    return res.status(400).json({ message: 'Dữ liệu không hợp lệ' });
   }
 
-  // Bước 3: Lấy quantity key đầu tiên
+  const tool = await db.Tool.findOne({ where: { id: orderId } });
+  if (!tool) {
+    return res.status(404).json({ message: 'Tool không tồn tại' });
+  }
+
+  const price = Number(tool.price);
+  let keyList = tool.key_value?.split(',') || [];
+
+  // Lọc ra key chưa dùng (không có dạng "-true-<id>")
+  const availableKeys = keyList.filter(k => !/-true-\d+$/.test(k));
+
+  if (availableKeys.length < quantity) {
+    console.warn(`Không đủ key. Yêu cầu: ${quantity}, còn: ${availableKeys.length}`);
+    return res.status(400).json({ message: 'Không đủ key để xử lý đơn hàng' });
+  }
+
   const selectedKeys = availableKeys.slice(0, quantity);
 
-  // Bước 4: Cập nhật lại keyList: đánh dấu các key đã dùng
-  const updatedKeyList = keyList.map(k => {
-    return selectedKeys.includes(k) ? `${k}-true` : k;
+  // Tạo key mới có định dạng: key-true-userId
+  const updatedKeyList = keyList.map(originalKey => {
+    if (selectedKeys.includes(originalKey)) {
+      return `${originalKey}-true-${userId}`;
+    }
+    return originalKey;
   });
 
-  // Bước 5: Trừ tiền user nếu đủ
-  const checkAssetUser = await db.User.findOne({ where: { id: userId } });
-  const assetUser = checkAssetUser.asset;
-
-  if (assetUser >= price * quantity) {
-    await db.User.update(
-      { asset: assetUser - price * quantity },
-      { where: { id: userId } }
-    );
-
-    // Bước 6: Update lại key_value
-    await db.Tool.update(
-      { key_value: updatedKeyList.join(',') },
-      { where: { id: orderId } }
-    );
-
-    // Bước 7: lưu selectedKeys cho controller phía sau dùng
-    req.selectedKeys = selectedKeys;
-
-    return next();
-  } else {
-    return res.redirect('/nap-tien');
+  const user = await db.User.findOne({ where: { id: userId } });
+  if (!user) {
+    return res.status(403).json({ message: 'Không tìm thấy người dùng' });
   }
 
+  const assetUser = Number(user.asset);
+  const totalPrice = price * quantity;
 
- 
-  
-  // const checkAssetUser = await db.User.findOne({where:{id:userId}})
-  // const assetUser = checkAssetUser.asset
-  // if(assetUser >= price*quantity) {
-  //   await db.User.update({ asset: assetUser - price*quantity }, { where: { id: userId } });
-  //   return next();
-  // }else{
-  //   res.redirect('/nap-tien')
-  // }
-}
+  if (assetUser < totalPrice) {
+    return res.status(400).json({ message: 'K đủ tiền' });
+  }
+
+  // Trừ tiền
+  await db.User.update(
+    { asset: assetUser - totalPrice },
+    { where: { id: userId } }
+  );
+
+  // Update lại key_value
+  await db.Tool.update(
+    { key_value: updatedKeyList.join(',') },
+    { where: { id: orderId } }
+  );
+
+  req.selectedKeys = selectedKeys;
+
+  return next();
+};
+
 module.exports = {
   checkAuth,
-  checkPayment};
+  checkPayment,
+};

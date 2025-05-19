@@ -1,278 +1,150 @@
-jQuery(document).ready(function ($) {
+const signIn = document.getElementById('signIn');
+const signUp = document.getElementById('signUp');
+const signInContainer = document.querySelector('#modal-login-container');
+const closeBtn = document.querySelectorAll('.close-login-modal');
+const overlayModal = document.querySelector('.modal .fade .show');
+const userAsset = document.querySelector('#user-asset');
+const formatNumer = document.querySelectorAll('.format-number');
+if(formatNumer){
+  formatNumer.forEach((item) => {
+    item.textContent = item.textContent.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  });
+}
+// covert userAsset *000 => *,000
+if(userAsset){
+  userAsset.textContent = userAsset.textContent.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+signUp.addEventListener('click', () => {
+  signInContainer.classList.add('right-panel-active');
+});
+signIn.addEventListener('click', () => {
+  signInContainer.classList.remove('right-panel-active');
+});
+closeBtn.forEach((item) => {
+  item.addEventListener('click', () => {
+    signInContainer.classList.remove('right-panel-active');
+  });
+});
+if (overlayModal) {
+  overlayModal.addEventListener('click', () => {
+    signInContainer.classList.remove('right-panel-active');
+  });
+}
 
-
-
-
-
-    $('.js-select').niceSelect();
-    $(document).on('click', '.menu-btn', function () {
-        $(this).toggleClass('is-active');
-        $('.sidebar').toggleClass('is-show');
-    });
-
-    const mediaHeader = window.matchMedia('(max-width: 959px)');
-
-    function handleHeader(e) {
-        if (e.matches) {
-            $('.menu-btn').removeClass('is-active');
-            $('.sidebar').removeClass('is-show');
-            $(document).on('click', '.menu-btn', function () {
-                $('body').toggleClass('no-scroll');
-            });
-        } else {
-            $('.menu-btn').addClass('is-active');
-            $('.sidebar').addClass('is-show');
-            $('body').removeClass('no-scroll');
-        }
+const showPassword = document.querySelectorAll('.show-password');
+showPassword.forEach((item) => {
+  item.addEventListener('click', () => {
+    const input = item.parentElement.querySelector('input');
+    if (input.getAttribute('type') === 'password') {
+      input.setAttribute('type', 'text');
+      // rename fa-eye to fa-eye-slash
+      item.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      input.setAttribute('type', 'password');
+      // rename fa-eye-slash to fa-eye
+      item.classList.replace('fa-eye-slash', 'fa-eye');
     }
+  });
+});
+// Đăng ký
+const formRegister = document.querySelector('#formRegister');
+formRegister.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(formRegister);
+  const data = Object.fromEntries(formData.entries());
 
-
-
-
-
-    $(".sidebar-hider .icon-arrow-left").click(function () {
-        $(".sidebar").removeClass("is-show");
-        $(".sidebar").addClass("is-hide");
-        $(document).on('click', '.menu-btn', function () {
-            $('body').toggleClass('no-scroll');
-        });
+  try {
+    const response = await fetch('/tai-khoan/dang-ky', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
     });
 
+    const result = await response.json();
+    if (response.ok) {
+      Toastify({
+        text: 'Đăng ký thành công',
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        style: {
+          background: '#26e6a3',
+        },
+      }).showToast();
+      formRegister.reset();
+      document.getElementById('signIn').click(); // chuyển sang tab đăng nhập
+    } else {
+      Toastify({
+        text: 'Có lỗi xảy ra',
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        style: {
+          background: '#f7462e',
+        },
+      }).showToast();
+    }
+  } catch (error) {
+    console.error('Lỗi đăng ký:', error);
+    Toastify({
+      text: 'Có lỗi xảy ra',
+      duration: 3000,
+      gravity: 'top',
+      position: 'right',
+      style: {
+        background: '#f7462e',
+      },
+    }).showToast();
+  }
+});
 
-    $(".sidebar-hider .icon-arrow-right").click(function () {
-        $(".sidebar").removeClass("is-hide");
-        $(".sidebar").addClass("is-show");
+// Đăng nhập
+const formLogin = document.querySelector('#formLogin');
+formLogin.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(formLogin);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const response = await fetch('/tai-khoan/dang-nhap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
     });
 
-
-
-    /////////////////////////////////////////////////////////////////
-    // Preloader
-    /////////////////////////////////////////////////////////////////
-
-    var $preloader = $('#page-preloader'),
-        $spinner = $preloader.find('.spinner-loader');
-    $spinner.fadeOut();
-    $preloader.delay(250).fadeOut('slow');
-
-
-
-    mediaHeader.addListener(handleHeader);
-    handleHeader(mediaHeader);
-    const recommendSlider = new Swiper('.js-recommend .swiper', {
-        slidesPerView: 1,
-        spaceBetween: 40,
-        loop: true,
-        watchOverflow: true,
-        observeParents: true,
-        observeSlideChildren: true,
-        observer: true,
-        speed: 800,
-        autoplay: {
-            delay: 5000
+    const result = await response.json();
+    if (response.ok) {
+      Toastify({
+        text: 'Đăng nhập thành công',
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        style: {
+          background: '#26e6a3',
         },
-        navigation: {
-            nextEl: '.js-recommend .swiper-button-next',
-            prevEl: '.js-recommend .swiper-button-prev'
+      }).showToast();
+      window.location.href = '/'; // hoặc redirect đến trang chính
+    } else {
+      Toastify({
+        text: 'Sai email hoặc mật khẩu',
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        style: {
+          background: '#f7462e',
         },
-        pagination: {
-            el: '.js-recommend .swiper-pagination',
-            type: 'bullets',
-            // 'bullets', 'fraction', 'progressbar'
-            clickable: true
-        }
-    });
-    const trendingSlider = new Swiper('.js-trending .swiper', {
-        slidesPerView: 1,
-        spaceBetween: 40,
-        loop: true,
-        watchOverflow: true,
-        observeParents: true,
-        observeSlideChildren: true,
-        observer: true,
-        speed: 800,
-        autoplay: {
-            delay: 5000
-        },
-        navigation: {
-            nextEl: '.js-trending .swiper-button-next',
-            prevEl: '.js-trending .swiper-button-prev'
-        },
-        pagination: {
-            el: '.js-trending .swiper-pagination',
-            type: 'bullets',
-            // 'bullets', 'fraction', 'progressbar'
-            clickable: true
-        }
-    });
-
-
-
-    const popularStore = new Swiper('.js-store .swiper', {
-        slidesPerView: 1,
-        spaceBetween: 25,
-        loop: true,
-        watchOverflow: true,
-        observeParents: true,
-        observeSlideChildren: true,
-        observer: true,
-        speed: 800,
-        autoplay: {
-            delay: 5000
-        },
-        navigation: {
-            nextEl: '.js-store .swiper-button-next',
-            prevEl: '.js-store .swiper-button-prev'
-        },
-        pagination: {
-            el: '.js-store .swiper-pagination',
-            type: 'bullets',
-            // 'bullets', 'fraction', 'progressbar'
-            clickable: true
-        },
-        breakpoints: {
-            575: {
-                slidesPerView: 1,
-                spaceBetween: 25
-            },
-            1199: {
-                slidesPerView: 4,
-                spaceBetween: 25
-            },
-            1599: {
-                slidesPerView: 5,
-                spaceBetween: 25
-            }
-        }
-    });
-
-
-
-
-
-
-    const popularSlider = new Swiper('.js-popular .swiper', {
-        slidesPerView: 1,
-        spaceBetween: 25,
-        loop: true,
-        watchOverflow: true,
-        observeParents: true,
-        observeSlideChildren: true,
-        observer: true,
-        speed: 800,
-        autoplay: {
-            delay: 5000
-        },
-        navigation: {
-            nextEl: '.js-popular .swiper-button-next',
-            prevEl: '.js-popular .swiper-button-prev'
-        },
-        pagination: {
-            el: '.js-popular .swiper-pagination',
-            type: 'bullets',
-            // 'bullets', 'fraction', 'progressbar'
-            clickable: true
-        },
-        breakpoints: {
-            575: {
-                slidesPerView: 1,
-                spaceBetween: 25
-            },
-            1199: {
-                slidesPerView: 2,
-                spaceBetween: 25
-            },
-            1599: {
-                slidesPerView: 4,
-                spaceBetween: 25
-            }
-        }
-    });
-
-
-
-    const popularSlider2 = new Swiper('.js-popular2 .swiper', {
-        slidesPerView: 1,
-        spaceBetween: 25,
-        loop: true,
-        watchOverflow: true,
-        observeParents: true,
-        observeSlideChildren: true,
-        observer: true,
-        speed: 800,
-        autoplay: {
-            delay: 5000
-        },
-        navigation: {
-            nextEl: '.js-popular2 .swiper-button-next',
-            prevEl: '.js-popular2 .swiper-button-prev'
-        },
-        pagination: {
-            el: '.js-popular2 .swiper-pagination',
-            type: 'bullets',
-            // 'bullets', 'fraction', 'progressbar'
-            clickable: true
-        },
-        breakpoints: {
-            575: {
-                slidesPerView: 1,
-                spaceBetween: 25
-            },
-            1199: {
-                slidesPerView: 2,
-                spaceBetween: 25
-            },
-            1599: {
-                slidesPerView: 3,
-                spaceBetween: 25
-            }
-        }
-    });
-
-
-
-
-    const gallerySmall = new Swiper('.js-gallery-small .swiper', {
-        slidesPerView: 1,
-        spaceBetween: 20,
-        loop: true,
-        watchOverflow: true,
-        observeParents: true,
-        observeSlideChildren: true,
-        observer: true,
-        speed: 800,
-        pagination: {
-            el: '.js-gallery-small .swiper-pagination',
-            type: 'bullets',
-            // 'bullets', 'fraction', 'progressbar'
-            clickable: true
-        },
-        breakpoints: {
-            575: {
-                slidesPerView: 2,
-                spaceBetween: 20
-            },
-            767: {
-                slidesPerView: 3,
-                spaceBetween: 20
-            },
-            1599: {
-                slidesPerView: 4,
-                spaceBetween: 20
-            }
-        }
-    });
-    const galleryBig = new Swiper('.js-gallery-big .swiper', {
-        slidesPerView: 1,
-        spaceBetween: 20,
-        loop: true,
-        watchOverflow: true,
-        observeParents: true,
-        observeSlideChildren: true,
-        observer: true,
-        speed: 800,
-        thumbs: {
-            swiper: gallerySmall
-        }
-    });
+      }).showToast();
+    }
+  } catch (error) {
+    console.error('Lỗi đăng nhập:', error);
+    Toastify({
+      text: 'Có lỗi xảy ra',
+      duration: 3000,
+      gravity: 'top',
+      position: 'right',
+      style: {
+        background: '#f7462e',
+      },
+    }).showToast();
+  }
 });

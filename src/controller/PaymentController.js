@@ -3,10 +3,38 @@ const db = require("../models");
 const payos = new PayOS('ef8f9217-1bed-46d1-bb02-07071cd5d960','248308c5-c0ba-4206-8d0d-32a5bf335b7e','460c50dceb5cacddf1cf9165ec354b9a221dbbb14cdd1123c85b93523cf5a094');
 const domain = "http://localhost:4000";
 const naptien = (req, res) => {
-    res.render("payment/naptien");
+    res.render("payment/naptien", { title: "Nạp tiển" });
 };
+const ruttien = (req, res) => {
+    res.render("payment/ruttien", { title: "Rút tiển" });
+};
+const ruttienven =async (req, res) => {
+    const { payment_value } = req.body;
+    const userId = req.user.id
+    const userInfo = await db.User.findOne({where:{id:userId}});
+    const userAsset = userInfo.asset;
+    if(userAsset >= Number(payment_value)) {
+        await db.Payment.create({
+            userId: userId,
+            payment_content:userId+ "rut tien",
+            status: true,
+            payment_value: Number(payment_value),
+        });
+        // update asset user from userId
+        const assetCurrentUser = await db.User.findOne({where:{id:userId}});
+        const newAsset = Number(assetCurrentUser.asset) - Number(payment_value);
+        
+        await db.User.update({ asset: newAsset }, { where: { id: userId } });
+        res.redirect("/thanh-toan/rut-tien/thanh-cong");
+    }
+    else {
+        res.redirect("/thanh-toan/rut-tien/that-bai");
+    }
+
+
+}
 const paymentSuccess = async (req, res) => {
-    res.render("payment/success");
+    res.render("payment/success",{title:"Thanh toán thành công đơn hàng"});
 };
 const payment =async (req, res) => {
     const { payment_value } = req.body;
@@ -18,7 +46,7 @@ const payment =async (req, res) => {
         amount: Number(payment_value),
         description: "userId" + userId + "nap tien",
         orderCode:getDateToilisecond,
-        returnUrl: domain+"/nap-tien/thanh-cong",
+        returnUrl: domain+"/thanh-toan/nap-tien/thanh-cong",
         cancelUrl: domain
     }
     const paymentLink = await payos.createPaymentLink(order);
@@ -42,4 +70,9 @@ const payment =async (req, res) => {
     
     
 };
-module.exports = { naptien, payment, paymentSuccess };
+const lichsunap =async (req, res) => {
+    const userId = req.user.id;
+    const payments = await db.Payment.findAll({where:{userId:userId}});
+    res.render("payment/lichsunap", { payments: payments, title: "Lịch sử nạp tiền" });
+}
+module.exports = { naptien, payment, paymentSuccess , ruttien, ruttienven, lichsunap };

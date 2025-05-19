@@ -1,0 +1,29 @@
+<% if (messages.error || messages.success || messages.warning) { %>
+    <div class="toasty">
+      <% if (messages.error) { %>
+        <div class="alert alert-danger" role="alert"><%- messages.error %></div>
+      <% } else if (messages.success) { %>
+        <div class="alert alert-success" role="alert"><%- messages.success %></div>
+      <% } else if (messages.warning) { %>
+        <div class="alert alert-warning" role="alert"><%- messages.warning %></div>
+      <% } %>
+    </div>
+  <% } %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const toasty = document.querySelector('.toasty');
+      console.log(" toasty:", toasty)
+  
+      if (toasty) {
+        setTimeout(() => {
+          toasty.classList.add('hidden');
+          console.log(123);
+          setTimeout(() => {
+            toasty.remove();
+            console.log(12345);
+          }, 1000);
+        }, 3000);
+      }
+    });
+  </script>
+  
