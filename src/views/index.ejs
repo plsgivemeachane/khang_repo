@@ -1,18 +1,13 @@
-
-  <div class="listing-account list-content">
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-    <%- include("../components/ui/ejs/accgame.ejs") %>
-
+<div class="home-content">
+  <div class="mb-5">
+    <%- include("./service/accgame/list-accgame.ejs") %>
   </div>
-  
-  <div class="listing-account list-content">
-    <%- include("../components/ui/ejs/toolgame.ejs") %>
+  <%- include("./service/tool/list-tool.ejs") %> 
+</div>
 
-  </div>
+<style>
+  .home-content{
+    padding-top: 60px;
 
+  }
+</style>

@@ -6,7 +6,7 @@ const { decodedToken } = require('../../service/jwt');
 const { checkPayment } = require('../../middleware/checkAuth');
 
 router.get('/', clientLayout, controller.index);
-router.get('/:slug', clientLayout, controller.detail);
+router.get('/xem-chi-tiet/:id', clientLayout, controller.detail);
 
 
 

@@ -5,14 +5,33 @@ const closeBtn = document.querySelectorAll('.close-login-modal');
 const overlayModal = document.querySelector('.modal .fade .show');
 const userAsset = document.querySelector('#user-asset');
 const formatNumer = document.querySelectorAll('.format-number');
-if(formatNumer){
+const formSubmit = document.querySelectorAll('.formSubmit');
+const btn_pagination = document.querySelectorAll('[button-pagination]');
+
+if (formSubmit) {
+  formSubmit.forEach((item) => {
+    console.log(' formSubmit.forEach ~ item:', item);
+    const buttonSubmit = item.querySelector('.btn-submit');
+    console.log(' formSubmit.forEach ~ buttonSubmit:', buttonSubmit);
+    item.addEventListener('submit', function (e) {
+      e.preventDefault();
+      buttonSubmit.textContent = 'Loading...';
+      buttonSubmit.disabled = true;
+      item.submit();
+    });
+  });
+}
+if (formatNumer) {
   formatNumer.forEach((item) => {
-    item.textContent = item.textContent.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    item.textContent = item.textContent.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   });
 }
 // covert userAsset *000 => *,000
-if(userAsset){
-  userAsset.textContent = userAsset.textContent.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+if (userAsset) {
+  userAsset.textContent = userAsset.textContent.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    ','
+  );
 }
 signUp.addEventListener('click', () => {
   signInContainer.classList.add('right-panel-active');
@@ -147,4 +166,61 @@ formLogin.addEventListener('submit', async (e) => {
       },
     }).showToast();
   }
+});
+$(document).ready(function () {
+  const defaultSrc = $('#main-image').attr('src');
+  let imageChanged = false;
+
+  // Click vào ảnh phụ -> đổi ảnh chính
+  $('.sub-image').on('click', function (e) {
+    e.stopPropagation(); // tránh bị trigger click trên body
+    const newSrc = $(this).attr('src');
+    $('#main-image').attr('src', newSrc);
+    imageChanged = true;
+  });
+
+  // Click ra ngoài (body) -> trả về ảnh ban đầu
+  $('body').on('click', function () {
+    if (imageChanged) {
+      $('#main-image').attr('src', defaultSrc);
+      imageChanged = false;
+    }
+  });
+
+  // Ngăn click trong vùng ảnh chính không reset
+  $('#main-image').on('click', function (e) {
+    e.stopPropagation();
+  });
+  const scrollAmount = 200; // px
+  const $list = $('.list_image');
+
+  $('.prev-thumb').on('click', function () {
+    $list.animate({ scrollLeft: $list.scrollLeft() - scrollAmount }, 300);
+  });
+
+  $('.next-thumb').on('click', function () {
+    $list.animate({ scrollLeft: $list.scrollLeft() + scrollAmount }, 300);
+  });
+  $('.description-content').readmore({
+    speed: 300,
+    collapsedHeight: 350,
+    moreLink: '<a href="#">Xem thêm</a>',
+    lessLink: '<a href="#">Thu gọn</a>',
+    afterToggle: function (trigger, element, expanded) {
+      if (!expanded) {
+        // When collapsed (after clicking "Thu gọn")
+        element.attr('style', 'overflow: hidden; height: 350px;'); // Add inline style
+        $('html, body').animate({ scrollTop: element.offset().top }, 100);
+      } else {
+        // When expanded (after clicking "Xem thêm")
+        element.attr('style', 'overflow: visible;'); // Reset to visible when expanded
+        // Remove the hidden content from the DOM
+        const hiddenContent = element.find('.readmore-js-collapsed');
+        console.log(" hiddenContent:", hiddenContent)
+        if (hiddenContent.length) {
+          hiddenContent.remove(); // Remove the hidden content
+        }
+      }
+    },
+  });
 });

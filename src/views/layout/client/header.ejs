@@ -187,9 +187,9 @@
               <span id="user-asset">Số dư <%=user.asset%> VNĐ</span>
             </div>
             <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle custom-avt" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-                <img src="<%=user.avatar%>" alt="">
-              </button>
+              
+                <img src="<%=user.avatar%>" alt=""  id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="custom-avt img-profile rounded-circle dropdown-toggle">
+              
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="/thanh-toan/lich-su-nap-tien">Lich sử nạp</a>
                 <a class="dropdown-item" href="/don-hang/lich-su-mua">Lịch sử mua key</a>
@@ -197,8 +197,8 @@
                 <a class="dropdown-item" href="#">Thông tin cá nhân</a>
                 <a class="dropdown-item" href="#">Rút tiền</a>
                 <% if(user.roleId == 1 || user.roleId == 3){ %>
-                <a class="dropdown-item" href="/admin">Đăng acc</a>
-                <a class="dropdown-item" href="#">Quản lý acc</a>
+                <a class="dropdown-item" href="/acc-game/dang-acc">Đăng acc</a>
+                <a class="dropdown-item" href="/acc-game/quan-ly">Quản lý acc</a>
 
                 <% } %>
                 <% if(user.roleId == 1){ %>
@@ -225,3 +225,90 @@
 </header>
 
 <%- include("../../auth/auth.ejs") %>
+<div id="menu-bottom-tabs" class="tabs">
+  <ul class="d-flex justify-content-between px-0 c-mb-8 flex-grow-1 flex-shrink-0 ">
+                  <script>
+              $(document).ready(function() {
+                  if ($('.menu-bottom-item-0').hasClass("is-active")) {
+                      $('.menu-bottom-item-0 .menu-bottom_icon').html(
+                          '<i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/Home%20-%20pink.png)"></i>'
+                      );
+                  }
+              });
+          </script>
+                          <li class="menu-bottom-item menu-bottom-item-0 px-0 is-active">
+                  <a href="/" class="d-flex justify-content-center c-p-5 fz-13 fw-400 flex-column align-items-center">
+                      <span class="menu-bottom_icon menu-bottom_icon c-pt-6 c-pb-2 text-center  c-mb-4 brs-24"><i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/Home%20-%20pink.png)"></i></span>
+                      <span class="menu-bottom_text fz-12">Home</span>
+                  </a>
+              </li>
+                              <script>
+              $(document).ready(function() {
+                  if ($('.menu-bottom-item-1').hasClass("is-active")) {
+                      $('.menu-bottom-item-1 .menu-bottom_icon').html(
+                          '<i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/Menu%20-%20pink.png)"></i>'
+                      );
+                  }
+              });
+          </script>
+                          <li class="menu-bottom-item menu-bottom-item-1 px-0  ">
+                  <a href="/service-mobile" class="d-flex justify-content-center c-p-5 fz-13 fw-400 flex-column align-items-center">
+                      <span class="menu-bottom_icon menu-bottom_icon c-pt-6 c-pb-2 text-center  c-mb-4 brs-24">
+                          <i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/Menu%20-%20pink.png)"></i>
+                      </span>
+                      <span class="menu-bottom_text fz-12">Menu</span>
+                  </a>
+              </li>
+                              <script>
+              $(document).ready(function() {
+                  if ($('.menu-bottom-item-2').hasClass("is-active")) {
+                      $('.menu-bottom-item-2 .menu-bottom_icon').html(
+                          '<i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/N%E1%BA%A1p%20th%E1%BA%BB%20-%20pink.png)"></i>'
+                      );
+                  }
+              });
+          </script>
+                                              <li class="menu-bottom-item menu-bottom-item-2 px-0  ">
+                      <a href="javascript:void(0);" onclick="openLoginModal();" class="d-flex justify-content-center c-p-5 fz-13 fw-400 flex-column align-items-center">
+                          <span class="menu-bottom_icon menu-bottom_icon c-pt-6 c-pb-2 text-center  c-mb-4 brs-24">
+                              <i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/N%E1%BA%A1p%20th%E1%BA%BB%20-%20pink.png)"></i>
+                          </span>
+                          <span class="menu-bottom_text fz-12">Nạp tiền</span>
+                      </a>
+                  </li>
+                                              <script>
+              $(document).ready(function() {
+                  if ($('.menu-bottom-item-3').hasClass("is-active")) {
+                      $('.menu-bottom-item-3 .menu-bottom_icon').html(
+                          '<i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/Mua%20acc%20-%20pink.png)"></i>'
+                      );
+                  }
+              });
+          </script>
+                          <li class="menu-bottom-item menu-bottom-item-3 px-0  ">
+                  <a href="/mua-acc" class="d-flex justify-content-center c-p-5 fz-13 fw-400 flex-column align-items-center">
+                      <span class="menu-bottom_icon menu-bottom_icon c-pt-6 c-pb-2 text-center  c-mb-4 brs-24">
+                          <i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/Mua%20acc%20-%20pink.png)"></i>
+                      </span>
+                      <span class="menu-bottom_text fz-12">Mua Acc</span>
+                  </a>
+              </li>
+                              <script>
+              $(document).ready(function() {
+                  if ($('.menu-bottom-item-4').hasClass("is-active")) {
+                      $('.menu-bottom-item-4 .menu-bottom_icon').html(
+                          '<i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/D%E1%BB%8Bch%20v%E1%BB%A5%20-%20pink.png)"></i>'
+                      );
+                  }
+              });
+          </script>
+                          <li class="menu-bottom-item menu-bottom-item-4 px-0  ">
+                  <a href="/profile" class="d-flex justify-content-center c-p-5 fz-13 fw-400 flex-column align-items-center">
+                      <span class="menu-bottom_icon menu-bottom_icon c-pt-6 c-pb-2 text-center  c-mb-4 brs-24">
+                          <i class="__icon__profile --sm__profile --link__profile" style="--path : url(https://cdn3.upanh.info/upload/server-sw3/images/Icon1/D%E1%BB%8Bch%20v%E1%BB%A5%20-%20pink.png)"></i>
+                      </span>
+                      <span class="menu-bottom_text fz-12">Tài khoản</span>
+                  </a>
+              </li>
+                      </ul>
+</div>

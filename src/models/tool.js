@@ -13,14 +13,14 @@ module.exports = (sequelize, DataTypes) => {
   Tool.init(
     {
       name: DataTypes.STRING,
-      description: DataTypes.STRING,
+      description: DataTypes.TEXT('long'),
       image: DataTypes.STRING,
       list_image:DataTypes.JSON,
       price: DataTypes.INTEGER,
       status: DataTypes.BOOLEAN,
       category_id: DataTypes.INTEGER,
       slug: DataTypes.STRING,
-      key_value:DataTypes.STRING,
+      key_value:DataTypes.TEXT("medium"),
 
     },
     {

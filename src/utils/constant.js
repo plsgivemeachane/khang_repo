@@ -82,6 +82,29 @@ const MenuDashboard = [
     ],
   },
 ];
+
+const statusgame = {
+pending:"Chờ duyệt",
+approved:"Duyệt",
+rejected:"Từ chối"
+}
+const ProtectRoutes=[
+  {
+    role:"Admin",
+    ulr:"/**",
+
+  },
+  {
+    role:"Seller",
+    ulr:"/admin/**",
+  },
+  {
+    role:"User",
+    ulr:"/admin/**,/acc-game/quan-ly,/acc-game/dang-acc",
+  }
+]
 module.exports = {
   MenuDashboard,
+  statusgame,
+  ProtectRoutes
 };

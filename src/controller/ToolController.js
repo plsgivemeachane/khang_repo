@@ -11,9 +11,9 @@ const index=async(req,res)=>{
  });
  const getNameCategory = categories.map((item) => item.name);
  const name = getNameCategory.join(', ');
- console.log(" index ~ name:", name)
- console.log(" index ~ name:", name)
+
  const newData = tool.map((item) => ({
+  id: item.id,
    name: item.name,
    image: item.image,
    price: item.price,
@@ -23,20 +23,29 @@ const index=async(req,res)=>{
  console.log(" newData ~ newData:", newData)
  
  
-  res.render("service/tool/hackgame",{tool:newData,title:"Xem tool game"});
+  res.render("service/tool/list-tool",{toolgame:newData,title:"Xem tool game"});
 }
 const detail = async (req, res) => {
-  const slug = req.params.slug;
+  const id = req.params.id;
 
-  const tool = await db.Tool.findOne({ where: { slug } });
+  const tool = await db.Tool.findOne({ where: { id } });
   if (!tool) return res.status(404).send("Tool not found");
 
   const category = await db.Category.findOne({
     where: { id: tool.category_id },
   });
+  let countKey = 0;
+  let keyList = tool.key_value?.split(',') || [];
 
+  keyList = keyList.map((item) =>{
+    // if key not - true - <id>
+    if(!/-true-\d+$/.test(item)){
+      countKey++;
+    }
+  });
+  
   const nameCategory = category ? category.name : "Không rõ";
-  console.log(" detail ~ nameCategory:", nameCategory)
+  
 
   const newData = {
     id: tool.id,
@@ -47,6 +56,7 @@ const detail = async (req, res) => {
     description: tool.description,
     slug: tool.slug,
     category_name: nameCategory,
+    quantity: countKey
   };
   console.log(" detail ~ newData:", newData)
 

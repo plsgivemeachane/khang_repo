@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { MenuDashboard } = require('../../utils/constand');
+const { MenuDashboard } = require('../../utils/constant');
 
 const clientLayout = async (req, res, next) => {
   const userId = req?.user?.id;

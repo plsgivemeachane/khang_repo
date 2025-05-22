@@ -1,16 +1,15 @@
 <div class="item-account">
   <div class="card card-hover h-100">
     <a
-      href="/dich-vu/hack-game/"
-      data-id="62935"
+      href="/dich-vu/hack-game/xem-chi-tiet/<%= id %>"
+
       class="card-body scale-thumb"
-      data-price="100000"
-      data-payment="1"
+
     >
       <div class="account-thumb c-mb-8 position-realative">
         <img
-          src="//cdn3.upanh.info/upload/server-sw3/images/Random%20Lien%20Quan%20Skin%20B%E1%BA%ADc%20SS%20Con.png"
-          alt="62935"
+          src="<%= image %>"
+          
           class="account-thumb-image lazy"
           onerror="imgError(this)"
           loading="lazy"
@@ -18,21 +17,19 @@
       </div>
       <div class="account-title">
         <div class="text-title fw-700 text-limit limit-1">
-          Random Liên Quân Skin SS
+          <%= name %>
         </div>
       </div>
       <div class="price">
-        <div class="price-current w-100">100.000đ</div>
+        <div class="price-current w-100 format-number"><%= price %> VNĐ</div>
 
-        <div class="discount">Acc free fire</div>
+        <div class="discount"><%= category_name %></div>
       </div>
       <div class="price c-pt-12 c-pt-lg-8">
         <button
           type="button"
           class="w-100 btn primary buyacc"
-          data-id="62935"
-          data-price="100000"
-          data-payment="1"
+    
         >
           Xem chi tiết
         </button>

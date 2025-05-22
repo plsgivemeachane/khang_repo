@@ -42,7 +42,7 @@ if (deleteImageBtn) {
       let image = btn.getAttribute('data-image');
 
       $.ajax({
-        url: `/admin/product/delete-image/${id}`,
+        url: `/admin/acc-game/xoa-anh/${id}`,
         type: 'POST',
         data: { image: image },
         success: function (response) {
@@ -165,37 +165,39 @@ $(document).ready(function () {
         })
         .get();
 
-        $.ajax({
-          url: '/admin/product/update-position',
-          type: 'POST',
-          data: { sortedIds },
-          success: function (response) {
-            console.log('✅ Success:', response);
-            Toastify({
-              text: 'Cập nhật vị trí thành công',
-              duration: 3000,
-              gravity: 'top',
-              position: 'right',
-              style: {
-                background: '#26e6a3',
-              }
-            }).showToast();
-            location.reload();
-          },
-          error: function (xhr) {
-            console.log('❌ Error:', xhr.responseJSON?.message || 'Có lỗi xảy ra');
-            Toastify({
-              text: xhr.responseJSON?.message || "Có lỗi xảy ra",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              style: {
-                background: "#f7462e",
-              }
-            }).showToast();
-          }
-        });
-        
+      $.ajax({
+        url: '/admin/product/update-position',
+        type: 'POST',
+        data: { sortedIds },
+        success: function (response) {
+          console.log('✅ Success:', response);
+          Toastify({
+            text: 'Cập nhật vị trí thành công',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            style: {
+              background: '#26e6a3',
+            },
+          }).showToast();
+          location.reload();
+        },
+        error: function (xhr) {
+          console.log(
+            '❌ Error:',
+            xhr.responseJSON?.message || 'Có lỗi xảy ra'
+          );
+          Toastify({
+            text: xhr.responseJSON?.message || 'Có lỗi xảy ra',
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            style: {
+              background: '#f7462e',
+            },
+          }).showToast();
+        },
+      });
     });
   }
 });
@@ -232,25 +234,88 @@ if (sort) {
     }
   }
 }
-const btn_pagination = document.querySelectorAll("[button-pagination]");
+const btn_pagination = document.querySelectorAll('[button-pagination]');
 if (btn_pagination) {
   btn_pagination.forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-      const page = btn.getAttribute("button-pagination");
+    btn.addEventListener('click', (event) => {
+      const page = btn.getAttribute('button-pagination');
       let url = new URL(window.location.href);
 
       try {
-        console.log("btn.addEventListener ~ url:", url);
-        if (page === "1") {
+        console.log('btn.addEventListener ~ url:', url);
+        if (page === '1') {
           // Xóa tham số "page" nếu đang ở trang 1
-          url.searchParams.delete("page");
+          url.searchParams.delete('page');
         } else {
-          url.searchParams.set("page", page);
+          url.searchParams.set('page', page);
         }
         window.location.href = url.toString();
       } catch (error) {
-        console.error("Error:", error);
+        console.error('Error:', error);
       }
     });
   });
 }
+
+(function ($) {
+  'use strict';
+
+  // Sidebar toggle
+  $('#sidebarToggle, #sidebarToggleTop').on('click', function (e) {
+    $('body').toggleClass('sidebar-toggled');
+    $('.sidebar').toggleClass('toggled');
+    if ($('.sidebar').hasClass('toggled')) {
+      $('.sidebar .collapse').collapse('hide');
+    }
+  });
+
+  // Close collapses on window resize
+  $(window).resize(function () {
+    if ($(window).width() < 768) {
+      $('.sidebar .collapse').collapse('hide');
+    }
+
+    if ($(window).width() < 480 && !$('.sidebar').hasClass('toggled')) {
+      $('body').addClass('sidebar-toggled');
+      $('.sidebar').addClass('toggled');
+      $('.sidebar .collapse').collapse('hide');
+    }
+  });
+
+  // Prevent the content wrapper from scrolling when the sidebar is hovered over
+  $('body.fixed-nav .sidebar').on(
+    'mousewheel DOMMouseScroll wheel',
+    function (e) {
+      if ($(window).width() > 768) {
+        var e0 = e.originalEvent;
+        var delta = e0.wheelDelta || -e0.detail;
+        this.scrollTop += (delta < 0 ? 1 : -1) * 30;
+        e.preventDefault();
+      }
+    }
+  );
+
+  // Scroll-to-top button show/hide
+  $(document).on('scroll', function () {
+    if ($(this).scrollTop() > 100) {
+      $('.scroll-to-top').fadeIn();
+    } else {
+      $('.scroll-to-top').fadeOut();
+    }
+  });
+
+  // Smooth scroll when clicking scroll-to-top
+  $(document).on('click', 'a.scroll-to-top', function (e) {
+    var $anchor = $(this);
+    $('html, body')
+      .stop()
+      .animate(
+        {
+          scrollTop: $($anchor.attr('href')).offset().top,
+        },
+        1000,
+        'easeInOutExpo'
+      );
+    e.preventDefault();
+  });
+})(jQuery);

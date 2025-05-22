@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT('long'),
       },
     
       image: {
@@ -41,7 +41,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       key_value: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT("medium"),
       },
       createdAt: {
         allowNull: false,

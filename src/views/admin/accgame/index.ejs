@@ -1,80 +1,132 @@
 <%- include("../../../components/ui/ejs/Toasty.ejs") %> <% if(data){ %>
-    <div class="table-responsive">
-     
-      <div class="mb-3 list-button-top-table">
-        <div class="d-flex gap-2 gap-md-4 align-items-center sort">
-          <select id="" class="form-select select-sort" sort-select>
-            <option value="" disabled selected>---Sắp xếp---</option>
-            <option value="name-asc">Sắp xếp theo tên A-Z</option>
-            <option value="name-desc">Sắp xếp theo tên Z-A</option>
-            <option value="createAt-asc">Sắp xếp theo thời gian tạo sớm nhất</option>
-            <option value="createAt-desc">Sắp xếp theo thời gian tạo muốn nhất</option>
-            <option value="price_origin-asc">Sắp xếp theo giá thấp đến cao</option>
-            <option value="price_origin-desc">Sắp xếp theo giá cao đến thấp</option>
-          </select>
-          <button class="btn btn-danger" id="reset">X</button>
-    
-        </div>
-        <button type="button" class="btn btn-primary">
-          <a href="/admin/acc-game/dang-acc" class="text-white text-decoration-none"
-            >➕ Thêm</a
-          >
-        </button>
-      </div>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Ảnh</th>
-            <th>Tên</th>
-            <th>Giá </th>
-            <th>Danh mục</th>
-            <th>Tác giả</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody id="sortable">
-          <% data.forEach((item, index) => { %>
-          <tr data-id="<%= item.id %>">
-            <th scope="row"><%= index + 1 %></th>
-            <td class="image-table">
-              <img src="<%= item.image %>" alt="<%= item.name %>" />
-            </td>
-            <td><%= item.name %></td>
-            <td><%= item.price %></td>
-            <td><%= item.category_name %></td>
-            <th><%= item.author %></th>
-          
-        
-            <td>
-            
-                <a href="/admin/acc-game/cap-nhat/<%= item.id %>" class="btn btn-primary mb-1">
-                  Sửa
-                </a>
-                        
-              <form
-                action="/admin/acc-game/xoa/<%= item.id %>?_method=DELETE"
-                method="post"
-              >
-                <button type="submit" class="btn btn-danger delete-btn-confirm">
-                  Xóa
-                </button>
-              </form>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-      
+<div class="table-responsive">
+  <!-- Toolbar -->
+  <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <select
+        class="form-control form-control-sm select-sort"
+        style="min-width: 200px"
+        sort-select
+      >
+        <option value="" disabled selected>--- Sắp xếp ---</option>
+        <option value="name-asc">Tên A-Z</option>
+        <option value="name-desc">Tên Z-A</option>
+        <option value="createAt-asc">Tạo sớm nhất</option>
+        <option value="createAt-desc">Tạo muộn nhất</option>
+        <option value="price_origin-asc">Giá thấp → cao</option>
+        <option value="price_origin-desc">Giá cao → thấp</option>
+      </select>
+      <button class="btn btn-outline-danger btn-sm" id="reset">Xóa lọc</button>
     </div>
-    <% } %>
-    <style>
-      .image-table img {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        display: block;
-        margin: auto;
+    <a href="/admin/acc-game/dang-acc" class="btn btn-primary btn-sm">
+      ➕ Thêm acc game
+    </a>
+  </div>
+
+  <!-- Table -->
+  <table class="table table-bordered table-hover table-sm align-middle">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Ảnh</th>
+        <th scope="col">Tên</th>
+        <th scope="col">Giá</th>
+        <th scope="col">Danh mục</th>
+        <th scope="col">Trạng thái</th>
+        <th scope="col">Tác giả</th>
+        <th scope="col" class="text-center">Hành động</th>
+      </tr>
+    </thead>
+    <tbody id="sortable">
+      <% data.forEach((item, index) => { %>
+      <tr data-id="<%= item.id %>">
+        <th scope="row"><%= index + 1 %></th>
+        <td class="image-table">
+          <img
+            src="<%= item.image %>"
+            alt="<%= item.name %>"
+            width="60"
+            height="60"
+            class="img-thumbnail"
+          />
+        </td>
+        <td><%= item.name %></td>
+        <td><%= item.price %></td>
+        <td><%= item.category_name %></td>
+        <td>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm <%= item.status === 'Chờ duyệt' ? 'btn-warning' : 'btn-outline-warning' %>" data-id="<%= item.id %>" data-status="Chờ duyệt" button-change-status>Chờ duyệt</button>
+            <button type="button" class="btn btn-sm <%= item.status === 'Duyệt' ? 'btn-success' : 'btn-outline-success' %>" data-id="<%= item.id %>" data-status="Duyệt" button-change-status>Duyệt</button>
+            <button type="button" class="btn btn-sm <%= item.status === 'Từ chối' ? 'btn-danger' : 'btn-outline-danger' %>" data-id="<%= item.id %>" data-status="Từ chối" button-change-status>Từ chối</button>
+          </div>
+        </td>
+        
+        <td><%= item.author %></td>
+        <td class="text-center">
+          <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a
+              href="/admin/acc-game/cap-nhat/<%= item.id %>"
+              class="btn btn-sm btn-outline-primary"
+            >
+              Sửa
+            </a>
+            <form
+              action="/admin/acc-game/xoa/<%= item.id %>?_method=DELETE"
+              method="post"
+              onsubmit="return confirm('Bạn có chắc muốn xóa acc này?');"
+            >
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                Xóa
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <div class="mt-4">
+    <%- include("../../../components/ui/ejs/pagination.ejs") %>
+  </div>
+</div>
+
+
+<% } %>
+<style>
+  .image-table img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+    margin: auto;
+  }
+</style>
+<script>
+  document.querySelectorAll('[button-change-status]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const status = btn.getAttribute('data-status');
+
+      try {
+        const res = await fetch('/admin/acc-game/status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id, status }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          window.location.reload(); // Hoặc cập nhật UI trực tiếp không cần reload
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Lỗi cập nhật trạng thái:', error);
+        alert('Có lỗi xảy ra khi cập nhật trạng thái');
       }
-    </style>
-    
+    });
+  });
+</script>
+

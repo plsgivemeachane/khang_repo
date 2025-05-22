@@ -1,0 +1,17 @@
+<div class="section-header c-mb-8 c-mb-lg-16 justify-content-between">
+    <h2 class="section-title fz-lg-15 lh-lg-24">
+        <i class="icon-title c-mr-8" style="--path:url(/assets/image/png/acc-game.png)"></i>
+        Acc game
+    </h2>
+    <a href="/xem-tat-ca?option=acc-game" class="link arr-right">Xem tất cả</a>
+</div>
+<div class="listing-account list-content">
+    
+    <% if(accgame && accgame.length > 0){ %>
+        <% accgame.forEach(item => { %>
+            <%- include("../../../components/ui/ejs/accgame.ejs",{id:item.id,name:item.name,image:item.image,category_name:item.category_name,price:item.price}) %>
+        <% }) %>
+        <% } %>
+
+
+  </div>

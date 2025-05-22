@@ -1,26 +1,37 @@
-const homeRouter = require('./client/HomeRouter'); // Import homeRouter
+const express = require('express');
+
+const homeRouter = require('./client/HomeRouter');
 const authRouter = require('./client/AuthRouter');
 const paymentRouter = require('./client/PaymentRouter');
 const accGameClientRouter = require('./client/AccGameClientRouter');
-const toolAdminRouter = require('./admin/ToolAdminRouter'); // Import toolRouter
+const toolAdminRouter = require('./admin/ToolAdminRouter');
 const CategoryAdminRouter = require('./admin/CategoryRouter');
 const orderRouter = require('./client/OrderRouter');
 const toolRouter = require('./client/ToolRouter');
 const accgameAdminRouter = require('./admin/AccGameRouter');
 const { decodedToken } = require('../service/jwt');
 const { authLayout, clientLayout, adminLayout } = require('../components/ui/ShareLayout');
-
+const CheckProtectRoutes = require('../middleware/protect-routes');
 
 module.exports = (app) => {
-  app.use('/', homeRouter);
-  // app.use('/auth', authRouter);
+  // Route không cần middleware
+  app.use('/', homeRouter); 
+
   app.use('/tai-khoan', authRouter);
-  app.use('/acc-game', decodedToken,accGameClientRouter);
-  app.use('/admin/danh-muc', decodedToken, CategoryAdminRouter);
-  app.use('/dich-vu/hack-game', decodedToken, toolRouter);
-  app.use('/admin/tool-game',decodedToken,adminLayout, toolAdminRouter)
-  app.use('/admin/acc-game',decodedToken,adminLayout, accgameAdminRouter)
-  app.use("/don-hang", orderRouter);
-  app.use('/thanh-toan', decodedToken,clientLayout, paymentRouter);
-  
+  // Group middleware: decodedToken + clientLayout
+  const clientGroup = express.Router();
+  clientGroup.use(decodedToken, clientLayout,CheckProtectRoutes);
+  clientGroup.use('/acc-game', accGameClientRouter);
+  clientGroup.use('/thanh-toan', paymentRouter);
+  clientGroup.use("/don-hang", orderRouter);
+  clientGroup.use('/dich-vu/hack-game', toolRouter);
+  app.use('/', clientGroup);
+
+  // Group middleware: decodedToken + adminLayout
+  const adminGroup = express.Router();
+  adminGroup.use(decodedToken, adminLayout,CheckProtectRoutes);
+  adminGroup.use('/admin/tool-game', toolAdminRouter);
+  adminGroup.use('/admin/acc-game', accgameAdminRouter);
+  adminGroup.use('/admin/danh-muc', CategoryAdminRouter);
+  app.use('/', adminGroup);
 };

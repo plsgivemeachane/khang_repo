@@ -4,20 +4,34 @@ const path = require("path");
 const route = require('./routes/index');
 const flash = require('express-flash');
 const expressLayouts = require('express-ejs-layouts');
-
+const methodOverride = require("method-override");
 
 const cookieParser = require('cookie-parser'); 
 const session = require('express-session');
 const database = require("./config/database");
 
+const app = express(); 
+const pathTinymce = path.join(__dirname, "..", "node_modules", "tinymce");
 
-const app = express();
+console.log(" pathTinymce:", pathTinymce)
+
+
+app.use(
+  "/tinymce",
+  express.static(path.join(__dirname, "..", "node_modules", "tinymce"))
+);
+app.use(
+  "/node_modules",
+  express.static(path.join(__dirname, "..", "node_modules"))
+);
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser('IH12345')); 
+app.use(methodOverride('_method'));
 app.use(
   session({
     secret: 'IH12345',

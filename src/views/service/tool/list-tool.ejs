@@ -1,0 +1,17 @@
+<div class="section-header c-mb-8 c-mb-lg-16 justify-content-between">
+    <h2 class="section-title fz-lg-15 lh-lg-24">
+        <i class="icon-title c-mr-8" style="--path:url(/assets/image/png/acc-game.png)"></i>
+        Tool game
+    </h2>
+    <a href="/xem-tat-ca?option=tool-game" class="link arr-right">Xem tất cả</a>
+</div>
+<div class="listing-account list-content">
+    
+    <% if(toolgame && toolgame.length > 0){ %>
+        <% toolgame.forEach(item => { %>
+            <%- include("../../../components/ui/ejs/toolgame.ejs",{id:item.id,name:item.name,image:item.image,category_name:item.category_name,price:item.price}) %>
+        <% }) %>
+        <% } %>
+
+
+  </div>

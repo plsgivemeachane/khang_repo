@@ -5,5 +5,7 @@ const {clientLayout} = require('../../components/ui/ShareLayout');
 const { decodedToken } = require('../../service/jwt');
 
 router.get('/', decodedToken, clientLayout, controller.index);
+router.get('/xem-tat-ca', decodedToken, clientLayout, controller.viewAll);
+router.get("/not-permission",controller.notPermission)
 
 module.exports = router;

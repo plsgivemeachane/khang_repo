@@ -14,7 +14,7 @@ module.exports = {
         allowNull: false,
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT('long'),
       },
       slug: {
         type: Sequelize.STRING,
@@ -28,8 +28,11 @@ module.exports = {
       price: {
         type: Sequelize.INTEGER,
       },
-      status: {
+      status_acc: {
         type: Sequelize.BOOLEAN,
+      },
+      status: {
+        type: Sequelize.STRING,
       },
       created_by: {
         type: Sequelize.INTEGER,

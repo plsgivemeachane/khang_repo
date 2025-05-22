@@ -1,0 +1,202 @@
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<style>
+  body {
+    background-color: #f8f9fa;
+  }
+  .filter-sidebar {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #fff;
+  }
+  .acc-card {
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .acc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+  .acc-card img {
+    object-fit: cover;
+    height: 180px;
+  }
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
+  }
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+</style>
+
+<div class="container py-4">
+  <% if (data && data.length > 0) { %>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="h4 m-0">
+        <%= optionPage === "acc-game" ? "Danh sách acc game" : "Danh sách tool game" %>
+      </h2>
+      <div class="d-flex gap-2">
+        <select class="form-select form-select-sm" id="sortSelect" style="min-width: 180px">
+          <option disabled selected>Sắp xếp theo</option>
+          <option value="price-asc">Giá thấp đến cao</option>
+          <option value="price-desc">Giá cao đến thấp</option>
+          <option value="newest">Mới nhất</option>
+        </select>
+        <button class="btn btn-outline-primary" id="sortBtn">Sắp xếp</button>
+      </div>
+      
+    </div>
+
+    <div class="row g-4">
+      <!-- Sidebar -->
+      <div class="col-md-3">
+        <div class="filter-sidebar">
+          <h6>Bộ lọc</h6>
+          <div class="mb-3">
+            <label class="form-label">Danh mục</label>
+            <select name="category_id" class="form-select">
+              <option value="" selected>Tất cả</option>
+              <% function selectTree(items, level = 1) {
+                  items.forEach(item => { %>
+                    <% const prefix = "--".repeat(level); %>
+                    <option value="<%= item.id %>"><%= prefix + item.name %></option>
+                    <% if (item.children && item.children.length > 0) {
+                      selectTree(item.children, level + 1);
+                    } %>
+              <% }) } %>
+              <% if (categoriesData && categoriesData.length > 0) {
+                selectTree(categoriesData);
+              } %>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label d-flex justify-content-between">
+              <span>Giá tối thiểu</span>
+              <span id="minPriceValue">0 VNĐ</span>
+            </label>
+            <input
+              type="range"
+              class="form-range"
+              min="0"
+              value="0"
+              max="5000000"
+              step="50000"
+              id="minPriceRange"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label d-flex justify-content-between">
+              <span>Giá tối đa</span>
+              <span id="maxPriceValue">5.000.000 VNĐ</span>
+            </label>
+            <input
+              type="range"
+              class="form-range"
+              min="0"
+              max="5000000"
+              step="50000"
+              value="5000000"
+              id="maxPriceRange"
+            />
+          </div>
+
+          <button class="btn btn-outline-dark w-100 btn-sm" id="applyFilterBtn">Áp dụng</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="col-md-9">
+        <div class="row g-3">
+          <% data.forEach((item) => { %>
+            <div class="col-12 col-sm-6 col-lg-4 fade-in">
+              <div class="acc-card">
+                <%- include("../../components/ui/ejs/card.ejs", {
+                  id: item.id,
+                  name: item.name,
+                  image: item.image,
+                  category_name: item.category_name,
+                  price: item.price,
+                  optionPage
+                }) %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="text-center">Không có dữ liệu</div>
+  <% } %>
+</div>
+
+
+<script>
+  const minSlider = document.getElementById('minPriceRange');
+  const maxSlider = document.getElementById('maxPriceRange');
+  const minLabel = document.getElementById('minPriceValue');
+  const maxLabel = document.getElementById('maxPriceValue');
+  const categorySelect = document.querySelector('select[name="category_id"]');
+  const sortSelect = document.getElementById('sortSelect');
+  const sortBtn = document.getElementById('sortBtn');
+  const applyBtn = document.getElementById('applyFilterBtn');
+
+  const formatMoney = (val) => parseInt(val).toLocaleString('vi-VN') + ' VNĐ';
+
+  minSlider.addEventListener('input', () => {
+    let min = parseInt(minSlider.value);
+    let max = parseInt(maxSlider.value);
+    if (min > max) minSlider.value = max;
+    minLabel.textContent = formatMoney(minSlider.value);
+  });
+
+  maxSlider.addEventListener('input', () => {
+    let min = parseInt(minSlider.value);
+    let max = parseInt(maxSlider.value);
+    if (max < min) maxSlider.value = min;
+    maxLabel.textContent = formatMoney(maxSlider.value);
+  });
+
+  const optionPage = '<%= optionPage %>';
+
+  // Nút "Áp dụng" bộ lọc
+  applyBtn.addEventListener('click', () => {
+    const min = minSlider.value;
+    const max = maxSlider.value;
+    const categoryId = categorySelect.value;
+
+    const params = new URLSearchParams({
+      option: optionPage,
+      min,
+      max,
+      category_id: categoryId
+    });
+
+    window.location.href = `/xem-tat-ca?${params.toString()}`;
+  });
+
+  // Nút "Sắp xếp"
+  sortBtn.addEventListener('click', () => {
+    const sort = sortSelect.value;
+
+    if (!sort) return alert("Vui lòng chọn kiểu sắp xếp");
+
+    const params = new URLSearchParams({
+      option: optionPage,
+      sort
+    });
+
+    window.location.href = `/xem-tat-ca?${params.toString()}`;
+  });
+</script>
+

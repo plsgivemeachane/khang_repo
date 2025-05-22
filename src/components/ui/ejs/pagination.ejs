@@ -1,0 +1,32 @@
+<ul class="pagination">
+    <% if (currentPage > 1) { %>
+    <li class="page-item">
+      <button class="page-link" button-pagination="1" id="firstPage">Trang đầu</button>
+    </li>
+    <% } %> <% if (currentPage > 1) { %>
+    <li class="page-item">
+      <button
+        class="page-link"
+        button-pagination="<%= currentPage - 1 %>"
+      >
+        Trang trước
+      </button>
+    </li>
+    <% } %> <% for (let page = currentPage-1; page <= currentPage+1;
+    page++) { %> <% if (page > 0 && page <= totalPage) { %>
+    <li class="page-item <%= page == currentPage ? 'active' : '' %>">
+      <button class="page-link" button-pagination="<%= page %>">
+        <%= page %>
+      </button>
+    </li>
+    <% } %> <% } %> <% if (currentPage < totalPage) { %>
+    <li class="page-item">
+      <button
+        class="page-link"
+        button-pagination="<%= currentPage + 1 %>"
+      >
+        Trang sau
+      </button>
+    </li>
+    <% } %>
+  </ul>

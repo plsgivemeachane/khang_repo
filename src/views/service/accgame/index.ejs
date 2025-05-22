@@ -1,0 +1,90 @@
+<%- include("../../../components/ui/ejs/Toasty.ejs") %> <% if(data){ %>
+  <div class="table-responsive">
+    <!-- Toolbar -->
+    <div class="mb-3 d-flex flex-wrap justify-content-between align-items-center">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <select class="form-control form-control-sm select-sort" style="min-width: 200px;" sort-select>
+          <option value="" disabled selected>--- Sắp xếp ---</option>
+          <option value="name-asc">Tên A-Z</option>
+          <option value="name-desc">Tên Z-A</option>
+          <option value="createAt-asc">Tạo sớm nhất</option>
+          <option value="createAt-desc">Tạo muộn nhất</option>
+          <option value="price_origin-asc">Giá thấp → cao</option>
+          <option value="price_origin-desc">Giá cao → thấp</option>
+        </select>
+        <button class="btn btn-outline-danger btn-sm" id="reset">
+          Xóa lọc
+        </button>
+      </div>
+      <a href="/admin/acc-game/dang-acc" class="btn btn-primary btn-sm">
+        ➕ Thêm acc game
+      </a>
+    </div>
+  
+    <!-- Table -->
+    <table class="table table-bordered table-hover table-sm align-middle">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Ảnh</th>
+          <th scope="col">Tên</th>
+          <th scope="col">Giá</th>
+          <th scope="col">Danh mục</th>
+          <th scope="col">Trạng thái</th>
+          <th scope="col">Tác giả</th>
+          <th scope="col" class="text-center">Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="sortable">
+        <% data.forEach((item, index) => { %>
+          <tr data-id="<%= item.id %>">
+            <th scope="row"><%= index + 1 %></th>
+            <td class="image-table">
+              <img src="<%= item.image %>" alt="<%= item.name %>" width="60" height="60" class="img-thumbnail">
+            </td>
+            <td><%= item.name %></td>
+            <td><%= item.price %></td>
+            <td><%= item.category_name %></td>
+            <td>
+              <% if(item.status=="Chờ duyệt"){ %>
+              <span class="badge px-3 py-2 bg-warning">Chờ duyệt</span>
+              <% } else if(item.status=="Duyệt") { %>
+              <span class="badge px-3 py-2 bg-success">Dang hoat dong</span>
+              <% } else { %>
+              <span class="badge px-3 py-2 bg-danger">Từ chối</span>
+              <% } %>
+            </td>
+            <td><%= item.author %></td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="/admin/acc-game/cap-nhat/<%= item.id %>" class="btn btn-sm btn-outline-primary">
+                  Sửa
+                </a>
+                <form
+                  action="/admin/acc-game/xoa/<%= item.id %>?_method=DELETE"
+                  method="post"
+                  onsubmit="return confirm('Bạn có chắc muốn xóa acc này?');"
+                >
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    Xóa
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  
+    <% } %>
+    <style>
+      .image-table img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        display: block;
+        margin: auto;
+      }
+    </style>
+    

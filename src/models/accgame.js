@@ -20,12 +20,13 @@ module.exports = (sequelize, DataTypes) => {
   AccGame.init(
     {
       name: DataTypes.STRING,
-      description: DataTypes.STRING,
+      description: DataTypes.TEXT('long'),
       slug: DataTypes.STRING,
       image: DataTypes.STRING,
       list_image:DataTypes.JSON,
       price: DataTypes.INTEGER,
-      status: DataTypes.BOOLEAN,
+      status_acc: DataTypes.BOOLEAN,
+    status: DataTypes.STRING,
       created_by:DataTypes.INTEGER,
       method_login:DataTypes.STRING,
       category_id:DataTypes.INTEGER,
