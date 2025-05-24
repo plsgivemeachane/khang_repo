@@ -51,7 +51,27 @@ const loginAuth = async (req, res) => {
     res.status(500).json({ message: 'Error' });
   }
 };
+const listUser = async (req, res) => {
+  try {
+    const listUser = await db.Auth.findAll();
+    const roleId = listUser.map((item) => item.roleId);
+    const role = await db.Role.findAll({ where: { id: roleId } });
+    const role_name = role.map((item) => item.name);
+    const name = role_name.join(', ');
+    const newData = listUser.map((item) => ({
+      id: item.id,
+      username: item.username,
+      email: item.email,
+      phoneNumber: item.phoneNumber,
+      role_name: name
+    }))
+    res.render('admin/auth/list', { listUser, role_name });
+  } catch (error) {
+    res.status(500).json({ message: 'Error' });
+  }
+}
 module.exports = {
   registerAuth,
   loginAuth,
+  listUser
 };

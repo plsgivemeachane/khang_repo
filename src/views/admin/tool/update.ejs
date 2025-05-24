@@ -1,0 +1,174 @@
+<div class="container py-4">
+    <h2 class="text-center text-primary mb-4">Cập nhật tool game</h2>
+  
+    <form
+      action="/admin/tool-game/cap-nhat/<%= toolgame.id %>?_method=PATCH"
+      method="POST"
+      enctype="multipart/form-data"
+      class="mx-auto bg-white p-4 rounded shadow w-100 w-md-75"
+      id="product-form"
+      autocomplete="off"
+    >
+      <div class="row g-3">
+        <!-- Tên tool -->
+        <div class="col-md-6">
+          <label class="form-label">Tên tool</label>
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            placeholder="Nhập tên tool"
+            required
+            value="<%= toolgame.name %>"
+          />
+        </div>
+  
+        <!-- Danh mục -->
+        <div class="col-md-6">
+          <label class="form-label">Danh mục</label>
+          <select name="category_id" class="form-select">
+            <option disabled>--Danh mục--</option>
+            <% if (categories?.length > 0) { %>
+              <%= selectTree(categories, 1, toolgame.category_id || "") %>
+            <% } %>
+          </select>
+        </div>
+  
+        <% function selectTree(items, level = 1, parent_id = "") { %>
+          <% items.forEach(item => { %>
+            <% let prefix = "--".repeat(level); %>
+            <option value="<%= item.id %>" <%= item.id == parent_id ? "selected" : "" %>>
+              <%= prefix + item.name %>
+            </option>
+            <% if (item.children?.length > 0) { %>
+              <%= selectTree(item.children, level + 1, parent_id) %>
+            <% } %>
+          <% }) %>
+        <% } %>
+            <div class="col-12">
+              <label class="form-label">Giá</label>
+              <input type="number" class="form-control" name="price" placeholder="Nhập giá" required value="<%= toolgame.price %>"/>
+            </div>   <!-- Mô tả -->
+        <div class="col-12">
+          <label class="form-label">Mô tả</label>
+          <textarea class="form-control decs_textarea" name="description" rows="4"><%= toolgame.description %></textarea>
+        </div>
+  
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label">Ảnh chính</label>
+              <input
+                type="file"
+                class="form-control"
+                name="image"
+                id="main-image"
+                accept="image/*"
+              />
+              <img
+                id="preview-main"
+                class="preview-image mt-2 d-none"
+                width="100"
+              />
+              <% if (toolgame.image) { %>
+                <div class="image-item">
+                  <img
+                    src="<%= toolgame.image %>"
+                    width="100"
+                    class="preview-image mt-2"
+                    data-image="<%= toolgame.image %>"
+                    
+                  />
+                  <input type="hidden" data-id="<%= toolgame.id %>">
+                  <button
+                    class="btn btn-danger mt-2 delete-image"
+                    data-image="<%= toolgame.image %>"
+                    data-url="tool-game"
+                
+                  >
+                    X
+                  </button>
+                </div>
+              <% } %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label">Ảnh phụ</label>
+              <input
+                type="file"
+                class="form-control"
+                name="list_image"
+                multiple
+                accept="image/*"
+                id="sub-images"
+              />
+              <div id="" class="list-image">
+              <% if (toolgame.list_image && toolgame.list_image.length > 0) { %>
+                <% toolgame.list_image.forEach((image) => { %>
+                  <div class="image-item">
+                    <img
+                      src="<%= image %>"
+                      width="100"
+                      class="preview-image mt-2"
+                    />
+                  <input type="hidden" data-id="<%= toolgame.id %>">
+  
+                    <button
+                      
+                      class="btn btn-danger mt-2 delete-image"
+                      data-image="<%= image %>"
+                      data-url="tool-game"
+                    >
+                      X
+                    </button>
+                  </div>
+                <% }); %>
+              <% } %>
+            </div>
+          </div>
+          </div>
+        </div>
+
+  
+        <!-- Trạng thái -->
+        <div class="col-md-6">
+          <label class="form-label d-block">Trạng thái</label>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="status" id="active" value="1" <%= toolgame.status == 1 ? "checked" : "" %>>
+            <label class="form-check-label" for="active">Còn</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="status" id="inactive" value="0" <%= toolgame.status == 0 ? "checked" : "" %>>
+            <label class="form-check-label" for="inactive">Không còn</label>
+          </div>
+        </div>
+  
+        <!-- Key value -->
+        <div class="col-md-6">
+          <label class="form-label">Key Value</label>
+          <textarea name="key_value" id="key" class="form-control" rows="4"><%= toolgame.key_value %></textarea>
+        </div>
+  
+        <!-- Nút submit -->
+        <div class="col-12 text-center mt-4">
+          <button type="submit" class="btn btn-success px-4">
+            <i class="fas fa-save me-2"></i> Cập nhật tool
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+    // Format key_value trước khi gửi
+    document.getElementById('product-form').addEventListener('submit', function (e) {
+      const textarea = document.getElementById('key');
+      const lines = textarea.value
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line);
+      textarea.value = lines.join(',');
+    });
+  </script>
+  

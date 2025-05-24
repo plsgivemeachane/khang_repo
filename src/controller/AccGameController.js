@@ -5,39 +5,30 @@ const { statusgame } = require('../utils/constant');
 const limtItem = 10;
 const currentPage = 1;
 const { createSlug } = require('../helper/create-slug');
+const { paginate } = require('../helper/pagination');
+
 const index = async (req, res) => {
   try {
-    // 1. Lấy tham số page từ query, mặc định là 1
-    const limitItem = 10;
     const currentPage = Number(req.query.page) || 1;
-    const offset = (currentPage - 1) * limitItem;
 
-    // 2. Lấy tổng số acc game để tính số trang
-    const totalAccGame = await db.AccGame.count();
-
-    // 3. Lấy danh sách acc game theo trang
-    const accGames = await db.AccGame.findAll({
-      limit: limitItem,
-      offset: offset,
+    const { items: accGames, pagination } = await paginate({
+      model: db.AccGame,
+      page: currentPage,
+      limit: 10,
     });
 
-    // 4. Lấy danh sách user và category liên quan
+    // Chuẩn bị mapping user/category như cũ
     const userIds = [...new Set(accGames.map((item) => item.created_by))];
     const categoryIds = [...new Set(accGames.map((item) => item.category_id))];
 
     const users = await db.User.findAll({ where: { id: userIds } });
-    const categories = await db.Category.findAll({
-      where: { id: categoryIds },
-    });
+    const categories = await db.Category.findAll({ where: { id: categoryIds } });
 
-    // 5. Tạo bản đồ ánh xạ user và category
     const userMap = {};
     users.forEach((user) => (userMap[user.id] = user.username));
-
     const categoryMap = {};
     categories.forEach((cat) => (categoryMap[cat.id] = cat.name));
 
-    // 6. Tạo danh sách render
     const newData = accGames.map((acc) => ({
       id: acc.id,
       name: acc.name,
@@ -48,13 +39,10 @@ const index = async (req, res) => {
       category_name: categoryMap[acc.category_id] || 'Không rõ',
     }));
 
-    const totalPage = Math.ceil(totalAccGame / limitItem);
-
-    // 7. Render ra view
     res.render('admin/accgame/index', {
       data: newData,
-      currentPage,
-      totalPage,
+      currentPage: pagination.currentPage,
+      totalPage: pagination.totalPages,
     });
   } catch (error) {
     console.error('Lỗi khi lấy danh sách acc game:', error);

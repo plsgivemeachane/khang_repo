@@ -3,6 +3,17 @@
     <%- include("./service/accgame/list-accgame.ejs") %>
   </div>
   <%- include("./service/tool/list-tool.ejs") %> 
+  <form action="/phong-chat/tao-phong" method="post">
+    <input type="text" name="name">
+    <input type="password" name="password" id="">
+    <button type="submit">Submit</button>
+  </form>
+  <h1>Join room</h1>
+  <form action="/phong-chat/vao-phong" method="post">
+    <input type="number" name="roomId">
+    <input type="password" name="password" id="">
+    <button type="submit">Submit</button>
+  </form>
 </div>
 
 <style>

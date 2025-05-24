@@ -67,4 +67,41 @@ input[type='checkbox'] {
 .description-content{
   overflow: hidden ! important;
   
+
+}
+/* Base toastify style */
+.toastify {
+  z-index: 1080 !important;
+  width: max-content;
+  padding: 12px 18px;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1) !important;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 4px solid transparent;
+}
+
+/* Text color depending on type */
+.toastify-success {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  border-left-color: #198754 !important;
+}
+.toastify-error {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+  border-left-color: #dc3545 !important;
+}
+.toastify-warning {
+  background-color: #fff3cd !important;
+  color: #664d03 !important;
+  border-left-color: #ffc107 !important;
+}
+.toastify-info {
+  background-color: #cff4fc !important;
+  color: #055160 !important;
+  border-left-color: #0dcaf0 !important;
 }

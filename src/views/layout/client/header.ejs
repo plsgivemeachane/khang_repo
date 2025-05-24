@@ -196,6 +196,9 @@
                 <a class="dropdown-item" href="#">Lịch sử mua acc</a>
                 <a class="dropdown-item" href="#">Thông tin cá nhân</a>
                 <a class="dropdown-item" href="#">Rút tiền</a>
+                <% if(user.roleId == 2){ %>
+                  <a href="/dang-ky-ban-acc" class="dropdown-item">Đăng ký bán acc</a>
+                <% } %>
                 <% if(user.roleId == 1 || user.roleId == 3){ %>
                 <a class="dropdown-item" href="/acc-game/dang-acc">Đăng acc</a>
                 <a class="dropdown-item" href="/acc-game/quan-ly">Quản lý acc</a>

@@ -8,7 +8,11 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */ static associate(models) {
       // 👇 Một Order có nhiều User
-     
+      Order.belongsTo(models.Tool, {
+        foreignKey: 'id',
+        as: 'tools',
+      });
+      
     }
   }
   Order.init(

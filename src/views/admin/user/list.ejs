@@ -1,0 +1,74 @@
+<div class="table-responsive bg-white shadow-sm p-3 rounded-3 fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="mb-0">Danh sách tool</h5>
+    <a href="/admin/tool/tao-moi" class="btn btn-sm btn-primary d-flex align-items-center gap-1">
+      <i class="fas fa-plus"></i> Thêm tool
+    </a>
+  </div>
+
+  <table class="table table-bordered table-hover align-middle text-center">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+       <th>Username</th>
+       <th>Email</th>
+       <th>SĐT</th>
+       <th>Quyền</th>
+       <th>Trạng thái</th>
+       <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% listUser.forEach((item, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          
+          <td class="text-start fw-semibold"><%= item.username %></td>
+          <td class="text-nowrap"><%= item.email %></td>
+          <td class="text-nowrap"><%= item.phoneNumber %></td>
+          <td class="text-nowrap"><%= item.role_name %></td>
+          <td>
+            <% if(item.status == 1) { %>
+              <span class="badge bg-success">Hoạt động</span>
+            <% } else { %>
+              <span class="badge bg-danger">Không hoạt động</span>
+            <% } %>
+          </td>
+          <td>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+              <a href="/admin/tool/cap-nhat/<%= item.id %>" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                <i class="fas fa-edit"></i> Sửa
+              </a>
+              <form action="/admin/tool/xoa/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Xóa tool này?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1">
+                  <i class="fas fa-trash"></i> Xóa
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <div class="test"></div>
+</div>
+
+<style>
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.6s ease-in-out forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  @media (max-width: 768px) {
+    .table {
+      font-size: 0.875rem;
+    }
+    .btn {
+      font-size: 0.75rem;
+    }
+  }
+</style>

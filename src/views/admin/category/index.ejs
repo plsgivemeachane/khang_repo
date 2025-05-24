@@ -1,38 +1,81 @@
-<div class="">
-    <h1 class="text-center text-2xl text-primary">Danh sách danh mục</h1>
-    <% if(categories && categories.length > 0) { %>
-    <div class="mt-4">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Tên danh mục</th>
-            <th scope="col">Danh mục cha</th>
-            
-            <th scope="col">Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-         <% categories.forEach((category, index) => { %>
-          <tr>
-              <th scope="row"><%= index + 1 %></th>
-              <td><%= category.name %></td>
-              <td><%= category.parent_name %></td>
-             
-              <td>
-                <button class="btn btn-primary">
-                  <a href="/admin/category/update/<%= category._id %>" class="text-white text-decoration-none">
-                      Sửa
-                  </a>
-                </button>
-                <button class="btn btn-danger">Delete</button>
-              </td>
-            </tr>
-          <% }) %>
-      
-        </tbody>
-      </table>
-    </div>
-    <% } %>
+<div class="table-responsive bg-white shadow-sm p-3 rounded-3 fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="mb-0">Danh sách danh mục</h5>
+    <a
+      href="/admin/danh-muc/tao-moi"
+      class="btn btn-sm btn-primary d-flex align-items-center gap-1"
+    >
+      <i class="fas fa-plus"></i> Thêm danh mục
+    </a>
   </div>
-  
+
+  <table class="table table-bordered table-hover align-middle text-center">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+
+        <th>Tên danh mục</th>
+
+        <th>Danh cha</th>
+
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% categories.forEach((item, index) => { %>
+      <tr>
+        <td><%= index + 1 %></td>
+
+        <td class="text-start fw-semibold"><%= item.name %></td>
+
+        <td class="text-nowrap"><%= item.parent_name %></td>
+
+        <td>
+          <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a
+              href="/admin/danh-muc/cap-nhat/<%= item.id %>"
+              class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+            >
+              <i class="fas fa-edit"></i> Sửa
+            </a>
+            <form
+              action="/admin/danh-muc/xoa/<%= item.id %>?_method=DELETE"
+              method="POST"
+              onsubmit="return confirm('Xóa danh mục này?');"
+            >
+              <button
+                type="submit"
+                class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+              >
+                <i class="fas fa-trash"></i> Xóa
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.6s ease-in-out forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .table {
+      font-size: 0.875rem;
+    }
+    .btn {
+      font-size: 0.75rem;
+    }
+  }
+</style>

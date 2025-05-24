@@ -40,9 +40,10 @@ if (deleteImageBtn) {
       const closestInput = btn.closest('div').querySelector('input');
       let id = closestInput.getAttribute('data-id');
       let image = btn.getAttribute('data-image');
+      let urlData = btn.getAttribute('data-url');
 
       $.ajax({
-        url: `/admin/acc-game/xoa-anh/${id}`,
+        url: `/admin/${urlData}/xoa-anh/${id}`,
         type: 'POST',
         data: { image: image },
         success: function (response) {

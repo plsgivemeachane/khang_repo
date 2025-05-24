@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userId',
         as: 'payments',
       })
+     
+      
     }
   }
   User.init({

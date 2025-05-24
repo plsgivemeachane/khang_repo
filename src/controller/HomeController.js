@@ -2,6 +2,8 @@ const createTree = require('../helper/createTree');
 const db = require('../models');
 const { Op } = require('sequelize');
 
+
+
 const index = async (req, res) => {
   const accgame = await db.AccGame.findAll({
     where: { status: 'Duyệt' },
@@ -118,10 +120,30 @@ const viewAll = async (req, res) => {
     categoriesData: newCategories,
   });
 };
+const registerSeller = async (req, res) => {
+  res.render('service/accgame/register-seller', { title: 'Đăng ký bán acc' });
+};
+const requestSeller = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+      return res.status(400).json({ message: 'Thiếu thông tin userId' });
+    }
 
+    // TODO: Ghi log hoặc lưu vào bảng Request nếu cần
+    // await db.SellerRequest.create({ userId, status: 'pending' });
+
+    return res.status(200).json({ message: 'Yêu cầu đã được gửi thành công!' });
+  } catch (error) {
+    console.error('Lỗi khi gửi yêu cầu seller:', error);
+    return res.status(500).json({ message: 'Đã xảy ra lỗi, vui lòng thử lại sau.' });
+  }
+};
 
 module.exports = {
   index,
   notPermission,
   viewAll,
+  registerSeller,
+  requestSeller
 };
