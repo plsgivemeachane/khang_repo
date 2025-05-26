@@ -1,211 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Phòng Chat - <%= roomId %></title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <script src="/socket.io/socket.io.js"></script>
-  <style>
-    body { background-color: #f0f2f5; }
-    .chat-box {
-      max-width: 700px;
-      margin: 40px auto;
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      height: 80vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-    .chat-message {
-      display: flex;
-      align-items: center;
-      max-width: 100%;
-      position: relative;
-    }
-    .chat-message.own { justify-content: flex-end; }
-    .chat-message.other { justify-content: flex-start; }
-    .bubble {
-      background-color: #fbe4e3;
-      color: black;
-      padding: 10px 14px;
-      border-radius: 20px;
-      font-size: 14px;
-      max-width: 60%;
-      position: relative;
-    }
-    .chat-message.own .bubble { background-color: #d9eaff; }
-    .message-actions {
-      display: flex;
-      gap: 8px;
-      margin-left: 8px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .chat-message:hover .message-actions { opacity: 1; }
-    .icon-circle {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1px solid #ccc;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .icon-circle i { font-size: 1rem; color: #333; }
-    .reply-preview {
-      border-left: 3px solid #ccc;
-      padding-left: 8px;
-      margin-bottom: 5px;
-      font-size: 12px;
-      color: #555;
-    }
-  </style>
-</head>
-<body>
-  <div class="chat-box shadow">
-    <h4 class="mb-3 text-center">Phòng Chat: <%= roomId %></h4>
+<title>Phòng Chat - <%= roomId %></title>
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  rel="stylesheet"
+/>
 
-    <div class="messages" id="messages"></div>
+<style>
+  body {
+    background-color: #f0f2f5;
+  }
+  .chat-box {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  .chat-message {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    position: relative;
+  }
+  .chat-message.own {
+    justify-content: flex-end;
+  }
+  .chat-message.other {
+    justify-content: flex-start;
+  }
+  .bubble {
+    background-color: #fbe4e3;
+    color: black;
+    padding: 10px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    max-width: 60%;
+    position: relative;
+  }
+  .chat-message.own .bubble {
+    background-color: #d9eaff;
+  }
+  .message-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .chat-message:hover .message-actions {
+    opacity: 1;
+  }
+  .icon-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .icon-circle i {
+    font-size: 1rem;
+    color: #333;
+  }
+  .reply-preview {
+    border-left: 3px solid #ccc;
+    padding-left: 8px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #555;
+  }
+</style>
 
-    <div id="replyContext" class="mb-2 text-muted" style="display: none;">
-      Đang trả lời <span id="replyToUser"></span>: "<span id="replyToContent"></span>"
-      <button onclick="clearReply()" class="btn btn-sm btn-link">Hủy</button>
-    </div>
+<div class="chat-box shadow">
+  <h4 class="mb-3 text-center">Phòng Chat: <%= roomId %></h4>
+  <input type="text" id="roomId" value="<%= roomId %>" hidden />
+  <input type="text" id="userId" value="<%= userId %>" hidden />
+  <div class="messages" id="messages"></div>
 
-    <div class="input-group">
-      <input id="messageInput" type="text" class="form-control" placeholder="Nhập tin nhắn..." autocomplete="off" />
-      <button class="btn btn-primary" onclick="sendMessage()">Gửi</button>
-    </div>
+  <div id="replyContext" class="mb-2 text-muted" style="display: none">
+    Đang trả lời <span id="replyToUser"></span>: "<span
+      id="replyToContent"
+    ></span
+    >"
+    <button onclick="clearReply()" class="btn btn-sm btn-link">Hủy</button>
   </div>
 
-  <script>
-    const socket = io();
-    socket.emit('join-room', { roomId: '<%= roomId %>', userId: '<%= userId %>' });
+  <div class="input-group">
+    <form id="chatForm" enctype="multipart/form-data">
+      <input type="file" name="image" accept="image/*" />
+      <input
+        type="text"
+        name="message"
+        id="messageInput"
+        placeholder="Nhập tin..."
+      />
+      <button type="submit">Gửi</button>
+    </form>
+  </div>
+</div>
 
-    const messagesEl = document.getElementById('messages');
-    const input = document.getElementById('messageInput');
-    const replyToUserSpan = document.getElementById('replyToUser');
-    const replyToContentSpan = document.getElementById('replyToContent');
-
-    let replyId = null;
-
-    document.addEventListener('click', function (e) {
-      if (e.target.closest('.delete-btn')) {
-        const btn = e.target.closest('.delete-btn');
-        const chatId = btn.dataset.id;
-        if (confirm('Xóa tin nhắn này?')) {
-          fetch(`/api/chat/delete/${chatId}`, { method: 'DELETE' })
-            .then(() => btn.closest('.chat-message').remove());
-        }
-      }
-
-      if (e.target.closest('.reply-btn')) {
-        const btn = e.target.closest('.reply-btn');
-        const chat = btn.closest('.chat-message');
-        if (!chat) return;
-        replyId = chat.dataset.id;
-        const user = chat.dataset.username;
-        const content = chat.querySelector('.bubble')?.innerText.trim();
-        if (!user || !content) return;
-        replyToUserSpan.innerText = user;
-        replyToContentSpan.innerText = content;
-        document.getElementById('replyContext').style.display = 'block';
-        input.focus();
-      }
-    });
-
-    function clearReply() {
-      replyId = null;
-      document.getElementById('replyContext').style.display = 'none';
-    }
-
-    async function sendMessage() {
-      const message = input.value.trim();
-      if (!message) return;
-
-      socket.emit('send-message', {
-        roomId: '<%= roomId %>',
-        userId: '<%= userId %>',
-        message,
-        replyId
-      });
-
-      await fetch('/api/chat/send-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomId: '<%= roomId %>', userId: '<%= userId %>', message, replyId })
-      });
-
-      input.value = '';
-      clearReply();
-      await loadChats();
-    }
-
-    socket.on('receive-message', loadChats);
-
-    async function loadChats() {
-      const res = await fetch(`/api/chat/list/<%= roomId %>`);
-      const chats = await res.json();
-
-      messagesEl.innerHTML = '';
-      chats.forEach(chat => {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('chat-message', chat.userSenderId == '<%= userId %>' ? 'own' : 'other');
-        wrapper.dataset.id = chat.id;
-        wrapper.dataset.username = chat.users?.username;
-
-        const bubble = document.createElement('div');
-        bubble.classList.add('bubble');
-
-        if (chat.replyMessage) {
-          const replyPreview = document.createElement('div');
-          replyPreview.classList.add('reply-preview');
-          replyPreview.innerText = `Trả lời ${chat.replyMessage.users?.username}: "${chat.replyMessage.content}"`;
-          bubble.appendChild(replyPreview);
-        }
-
-        bubble.appendChild(document.createTextNode(chat.content));
-        wrapper.appendChild(bubble);
-
-        const actions = document.createElement('div');
-        actions.classList.add('message-actions');
-
-        const replyBtn = document.createElement('div');
-        replyBtn.className = 'icon-circle reply-btn';
-        replyBtn.dataset.id = chat.id;
-        replyBtn.dataset.user = chat.users?.username;
-        replyBtn.innerHTML = '<i class="bi bi-reply"></i>';
-        actions.appendChild(replyBtn);
-
-        if (chat.userSenderId == '<%= userId %>') {
-          const delBtn = document.createElement('div');
-          delBtn.className = 'icon-circle delete-btn';
-          delBtn.dataset.id = chat.id;
-          delBtn.innerHTML = '<i class="bi bi-trash"></i>';
-          actions.appendChild(delBtn);
-        }
-
-        wrapper.appendChild(actions);
-        messagesEl.appendChild(wrapper);
-      });
-
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    loadChats();
-  </script>
-</body>
-</html>
+<!-- Setup biến toàn cục cho socket.js -->
+<script>
+  window.roomId = document.getElementById('roomId')?.value;
+  window.userId = document.getElementById('userId')?.value;
+</script>

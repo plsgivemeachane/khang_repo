@@ -31,6 +31,7 @@ console.log(" pathTinymce:", pathTinymce);
 app.use("/tinymce", express.static(pathTinymce));
 app.use("/node_modules", express.static(path.join(__dirname, "..", "node_modules")));
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/uploads', express.static('public/uploads'));
 
 // View + Layouts
 app.set("views", path.join(__dirname, "views"));

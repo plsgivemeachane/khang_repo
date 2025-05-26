@@ -21,12 +21,13 @@ module.exports = (app) => {
   app.use('/', homeRouter); 
 
   app.use('/tai-khoan', authRouter);
-  app.use('/phong-chat', decodedToken,RoomRouter);
   app.use('/api/chat', ChatApiRouter)
 
   // Group middleware: decodedToken + clientLayout
   const clientGroup = express.Router();
   clientGroup.use(decodedToken, clientLayout,CheckProtectRoutes);
+  clientGroup.use('/phong-chat', RoomRouter);
+
   clientGroup.use('/acc-game', accGameClientRouter);
   clientGroup.use('/thanh-toan', paymentRouter);
   clientGroup.use("/don-hang", orderRouter);

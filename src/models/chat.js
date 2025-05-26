@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'replyId',
         as: 'replyMessage',
       });
-      
+      Chat.hasMany(models.ChatRead, { foreignKey: 'chatId', as: 'chatReads' });
     }
   }
 
@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       userSenderId: DataTypes.INTEGER,
-      content: DataTypes.TEXT("medium"),
+      content: DataTypes.TEXT('medium'),
+      imageUrl: DataTypes.STRING,
       replyId: DataTypes.INTEGER,
     },
     {

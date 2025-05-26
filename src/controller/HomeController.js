@@ -140,10 +140,39 @@ const requestSeller = async (req, res) => {
   }
 };
 
+
+const listRoom = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    // Lấy tất cả các phòng
+    const allRooms = await db.Room.findAll();
+
+    // Lọc những phòng mà userId có trong member
+    const joinedRooms = allRooms.filter(room => {
+      const members = Array.isArray(room.member)
+        ? room.member
+        : JSON.parse(room.member || '[]');
+      return members.includes(userId);
+    });
+
+    res.render("layout/client/roomchat", {
+      title: "Room chat",
+      rooms: joinedRooms,
+      userId: req.user.id, // đừng quên dòng này
+    });
+    
+  } catch (error) {
+    console.error('listRoom error:', error);
+    res.status(500).send('Server error');
+  }
+};
+
 module.exports = {
   index,
   notPermission,
   viewAll,
   registerSeller,
-  requestSeller
+  requestSeller,
+  listRoom
 };

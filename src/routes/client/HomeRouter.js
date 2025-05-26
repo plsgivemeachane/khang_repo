@@ -10,4 +10,5 @@ router.get('/dang-ky-ban-acc', decodedToken, clientLayout, controller.registerSe
 router.post('/dang-ky-ban-acc', decodedToken, controller.requestSeller);
 router.get("/not-permission",controller.notPermission)
 
+
 module.exports = router;
