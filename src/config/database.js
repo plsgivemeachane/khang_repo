@@ -1,6 +1,6 @@
 const {Sequelize} = require("sequelize")
 const sequelize = new Sequelize('khang', 'root', '', {
-    host: 'localhost',
+    host: 'https://demo-game-lnck.onrender.com',
     dialect: 'mysql',
     logging: false
 })
