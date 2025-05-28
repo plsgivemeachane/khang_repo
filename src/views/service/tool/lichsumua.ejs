@@ -18,7 +18,10 @@
                   <th scope="row"><%= index + 1 %></th>
                   <td><%= item.toolName %></td>
                   <td class="price-value"><%= item.price %></td>
-                  <td><%= key %></td>
+                  <td>
+                    <span><%= key %></span>
+                    <span class="copy-icon"><i class="fa-solid fa-copy"></i></span>
+                  </td>
                   <td class="createdAt"><%= item.orderedAt %></td>
                 </tr>
               <% }) %>
@@ -32,6 +35,14 @@
           
       </table>
 </div>
+<style>
+  .copy-icon {
+    cursor: pointer;
+    color: #007bff;
+    margin-left: 10px;
+    font-size: 18px;
+  }
+</style>
 <script>
     const formatPrice = document.querySelectorAll('.price-value');
     formatPrice.forEach(price => {
@@ -41,4 +52,14 @@
     formatDate.forEach(date => {
         date.innerHTML = new Date(date.innerHTML).toLocaleString();
     })
+    const copyBtn = document.querySelectorAll(".copy-icon");
+    copyBtn.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const copyText = btn.parentElement.querySelector("span").textContent;
+            navigator.clipboard.writeText(copyText).then(() => {
+             alert("Copy key thành công");
+            });
+        });
+    });
+
 </script>

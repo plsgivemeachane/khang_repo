@@ -6,11 +6,14 @@ const expCookie = 1000*60*60*24*30;// 30 days
 
 
 const registerAuth = async (req, res) => {
-  const {username, email, password, phoneNumber} = req.body;
-  const getUserRole = await db.Role.findOne({where:{name:'user'}});
-  const userRoleId = getUserRole.id
-  const hashPassword = await bcrypt.hash(password, 10);
   try {
+    const {username, email, password, phoneNumber} = req.body;
+    const getUserRole = await db.Role.findOne({where:{name:'User'}});
+    console.log(" registerAuth ~  req.body:",  req.body)
+    console.log(" registerAuth ~ getUserRole:", getUserRole)
+    const userRoleId = getUserRole.id
+    console.log(" registerAuth ~ userRoleId:", userRoleId)
+    const hashPassword = await bcrypt.hash(password, 10);
     await db.User.create({
       username,
       email,
@@ -34,7 +37,7 @@ const loginAuth = async (req, res) => {
       },
     })
     if(!user){
-      res.send('User not found');
+      return res.status(404).json({ message: 'Sai tài khoản hoặc mật khẩu' });
     }
     const checkPassword = await bcrypt.compare(password, user.password);
     if(!checkPassword){
@@ -46,7 +49,7 @@ const loginAuth = async (req, res) => {
       httpOnly: true,
       maxAge: expCookie, //
     });
-    res.status(200).json({ message: 'Login successfully' });
+    res.status(200).json({ message: 'Đăng nhập thành công' });
   } catch (error) {
     res.status(500).json({ message: 'Error' });
   }
@@ -70,8 +73,17 @@ const listUser = async (req, res) => {
     res.status(500).json({ message: 'Error' });
   }
 }
+const logoutAuth = async (req, res) => {
+  try {
+    res.clearCookie('access_token');
+    res.redirect('/');
+  } catch (error) {
+    res.status(500).json({ message: 'Error' });
+  }
+}
 module.exports = {
   registerAuth,
   loginAuth,
-  listUser
+  listUser,
+  logoutAuth
 };

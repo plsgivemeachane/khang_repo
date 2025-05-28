@@ -1,3 +1,4 @@
+<%- include('../../../components/ui/ejs/Toasty.ejs') %>
 <div class="table-responsive bg-white shadow-sm p-3 rounded-3 fade-in">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h5 class="mb-0">Danh sách tool</h5>
@@ -36,10 +37,10 @@
           </td>
           <td>
             <div class="d-flex justify-content-center gap-2 flex-wrap">
-              <a href="/admin/tool/cap-nhat/<%= item.id %>" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+              <a href="/admin/nguoi-dung/cap-nhat/<%= item.id %>" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
                 <i class="fas fa-edit"></i> Sửa
               </a>
-              <form action="/admin/tool/xoa/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Xóa tool này?');">
+              <form action="/admin/nguoi-dung/xoa/<%= item.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Xóa người dùng này?');">
                 <button type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1">
                   <i class="fas fa-trash"></i> Xóa
                 </button>

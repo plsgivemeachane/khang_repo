@@ -1,0 +1,31 @@
+<div class="container py-4">
+  <h2 class="mb-4">Kết quả tìm kiếm cho "<%= keyword %>"</h2>
+
+  <!-- TOOL GAME -->
+  <h4 class="text-primary mb-3">Tool Game</h4>
+  <% if (resultsTool.length === 0) { %>
+    <p class="text-muted">Không tìm thấy tool nào.</p>
+  <% } else { %>
+    <div class="row">
+      <% resultsTool.forEach(tool => { %>
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+          <%- include("../../components/ui/ejs/toolgame.ejs",{id:tool.id,name:tool.name,image:tool.image,category_name:tool.category_name,price:tool.price}) %>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- ACC GAME -->
+  <h4 class="text-success mt-5 mb-3">Acc Game</h4>
+  <% if (resultsAcc.length === 0) { %>
+    <p class="text-muted">Không tìm thấy acc nào.</p>
+  <% } else { %>
+    <div class="row">
+      <% resultsAcc.forEach(acc => { %>
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+         <%- include("../../components/ui/ejs/accgame.ejs",{id:acc.id,name:acc.name,image:acc.image,category_name:acc.category_name,price:acc.price}) %>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

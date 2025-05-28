@@ -1,15 +1,14 @@
 const db = require('../models');
 
-// controllers/ChatController.js
 const createChat = async (req, res) => {
   try {
     const { roomId, userId, message, replyId } = req.body;
     const room = await db.Room.findOne({ where: { roomId } });
-    if (!room) return res.status(404).json({ success: false, message: 'Phòng không tồn tại' });
+    if (!room) return res.status(404).json({ success: false });
 
     const imageUrl = req.file ? `/uploads/chat/${req.file.filename}` : null;
 
-    await db.Chat.create({
+    const chat = await db.Chat.create({
       groupId: room.id,
       userSenderId: userId,
       content: message || null,
@@ -17,14 +16,13 @@ const createChat = async (req, res) => {
       imageUrl,
     });
 
-    res.status(200).json({ success: true, message: 'Thành công' });
+    res.status(200).json({ success: true, chatId: chat.id });
   } catch (err) {
-    console.error("createChat ~ err:", err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('createChat error:', err);
+    res.status(500).json({ success: false });
   }
 };
 
-// controllers/chatController.js
 const getChats = async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -32,10 +30,7 @@ const getChats = async (req, res) => {
     const offset = parseInt(req.query.offset) || 0;
 
     const room = await db.Room.findOne({ where: { roomId } });
-    if (!room)
-      return res
-        .status(404)
-        .json({ success: false, message: 'Phòng không tồn tại' });
+    if (!room) return res.status(404).json({ success: false });
 
     const chats = await db.Chat.findAll({
       where: { groupId: room.id },
@@ -49,65 +44,80 @@ const getChats = async (req, res) => {
         {
           model: db.ChatRead,
           as: 'chatReads',
-          include: [
-            {
-              model: db.User,
-              as: 'user', // 👈 alias cho ChatRead.belongsTo(User, { as: 'user' })
-              attributes: ['username'],
-            },
-          ],
+          include: [{ model: db.User, as: 'user', attributes: ['username'] }],
         },
       ],
-
       order: [['createdAt', 'DESC']],
       limit,
       offset,
     });
 
     res.json(chats);
-  } catch (error) {
-    console.error('getChats ~ error:', error);
+  } catch (err) {
+    console.error('getChats ~ error:', err);
     res.status(500).json({ success: false });
   }
 };
+
 const markAsRead = async (req, res) => {
   try {
-    const { chatId, userId } = req.body;
-    if (!chatId || !userId) {
-      return res.status(400).json({ success: false, message: 'Thiếu dữ liệu' });
-    }
+    let { chatId, userId } = req.body;
+    userId = parseInt(userId);
+    chatId = parseInt(chatId);
 
-    const existing = await db.ChatRead.findOne({
-      where: { chatId, userId },
-    });
+    const exists = await db.ChatRead.findOne({ where: { chatId, userId } });
+    if (!exists) {
+      await db.ChatRead.create({ chatId, userId, seenAt: new Date() });
 
-    if (!existing) {
-      await db.ChatRead.create({
-        chatId,
-        userId,
-        seenAt: new Date(),
+      const chat = await db.Chat.findByPk(chatId, {
+        include: [
+          {
+            model: db.ChatRead,
+            as: 'chatReads',
+            include: [{ model: db.User, as: 'user', attributes: ['username'] }],
+          },
+        ],
       });
+
+      const seenUsers = chat.chatReads.map((r) => r.user?.username).filter(Boolean);
+      req.io.to(String(chat.groupId)).emit('message-seen-update', { chatId, seenUsers });
     }
 
-    // Lấy lại danh sách người đã xem sau khi cập nhật
-    const reads = await db.ChatRead.findAll({
-      where: { chatId },
-      include: [{ model: db.User, as: 'user', attributes: ['username'] }],
-    });
-
-    const seenUsers = reads.map(r => r.user?.username).filter(Boolean);
-
-    // Gửi realtime cập nhật đến các client (nếu socket đã setup như io.emit)
-    if (req.app && req.app.get('io')) {
-      const io = req.app.get('io');
-      io.emit('message-seen-update', { chatId, seenUsers });
-    }
-
-    res.json({ success: true, seenUsers });
+    res.json({ success: true });
   } catch (err) {
     console.error('markAsRead ~ error:', err);
     res.status(500).json({ success: false });
   }
 };
 
-module.exports = { createChat, getChats , markAsRead};
+const deleteChat = async (req, res) => {
+  try {
+    const chatId = parseInt(req.params.chatId);
+
+    const chat = await db.Chat.findByPk(chatId);
+    if (!chat) return res.status(404).json({ success: false, message: 'Tin nhắn không tồn tại' });
+
+    // Nếu có ảnh thì xóa file khỏi ổ đĩa
+    if (chat.imageUrl) {
+      const imagePath = path.join(__dirname, '../public', chat.imageUrl);
+      fs.unlink(imagePath, (err) => {
+        if (err) console.error('❌ Không thể xóa ảnh:', err.message);
+        else console.log(`🧹 Đã xóa ảnh: ${chat.imageUrl}`);
+      });
+    }
+
+    // Xóa các bản ghi đọc liên quan (nếu có)
+    await db.ChatRead.destroy({ where: { chatId } });
+
+    // Xóa tin nhắn
+    await chat.destroy();
+
+    res.json({ success: true, message: 'Đã xóa thành công' });
+  } catch (err) {
+    console.error('❌ deleteChat error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};
+
+
+module.exports = { createChat, getChats, markAsRead, deleteChat };

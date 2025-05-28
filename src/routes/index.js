@@ -12,6 +12,7 @@ const accgameAdminRouter = require('./admin/AccGameRouter');
 const UserAdminRouter = require('./admin/UserRouter')
 const ChatApiRouter = require('./api/ChatRouter');
 const RoomRouter = require('./client/RoomRouter');
+const DashboardRouter = require('./admin/DashboardRouter');
 const { decodedToken } = require('../service/jwt');
 const { authLayout, clientLayout, adminLayout } = require('../components/ui/ShareLayout');
 const CheckProtectRoutes = require('../middleware/protect-routes');
@@ -41,5 +42,6 @@ module.exports = (app) => {
   adminGroup.use('/admin/acc-game', accgameAdminRouter);
   adminGroup.use('/admin/danh-muc', CategoryAdminRouter);
   adminGroup.use('/admin/nguoi-dung', UserAdminRouter);
+  adminGroup.use('/admin/quan-ly', DashboardRouter);
   app.use('/', adminGroup);
 };

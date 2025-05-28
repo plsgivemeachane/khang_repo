@@ -2,36 +2,39 @@ const db = require('../models');
 const createTree = require('../helper/createTree');
 const { createSlug } = require('../helper/create-slug');
 const cloudinary = require('../config/cloudinary');
+const { paginate } = require('../helper/pagination');
 
-const index=async(req,res)=>{
-  const tool = await db.Tool.findAll()
- const categoryId = await tool.map((item) => item.category_id);
- const categories = await db.Category.findAll({
-   where: {
-     id: categoryId,
-   },
- });
- const getNameCategory = categories.map((item) => item.name);
- const name = getNameCategory.join(', ');
+const index = async (req, res) => {
+  const tool = await db.Tool.findAll();
+  const categoryId = await tool.map((item) => item.category_id);
+  const categories = await db.Category.findAll({
+    where: {
+      id: categoryId,
+    },
+  });
+  const getNameCategory = categories.map((item) => item.name);
+  const name = getNameCategory.join(', ');
 
- const newData = tool.map((item) => ({
-  id: item.id,
-   name: item.name,
-   image: item.image,
-   price: item.price,
-   slug:createSlug(item.name),
-   category_name: name,
- }))
- console.log(" newData ~ newData:", newData)
- 
- 
-  res.render("service/tool/list-tool",{toolgame:newData,title:"Xem tool game"});
-}
+  const newData = tool.map((item) => ({
+    id: item.id,
+    name: item.name,
+    image: item.image,
+    price: item.price,
+    slug: createSlug(item.name),
+    category_name: name,
+  }));
+  console.log(' newData ~ newData:', newData);
+
+  res.render('service/tool/list-tool', {
+    toolgame: newData,
+    title: 'Xem tool game',
+  });
+};
 const detail = async (req, res) => {
   const id = req.params.id;
 
   const tool = await db.Tool.findOne({ where: { id } });
-  if (!tool) return res.status(404).send("Tool not found");
+  if (!tool) return res.status(404).send('Tool not found');
 
   const category = await db.Category.findOne({
     where: { id: tool.category_id },
@@ -39,33 +42,31 @@ const detail = async (req, res) => {
   let countKey = 0;
   let keyList = tool.key_value?.split(',') || [];
 
-  keyList = keyList.map((item) =>{
+  keyList = keyList.map((item) => {
     // if key not - true - <id>
-    if(!/-true-\d+$/.test(item)){
+    if (!/-true-\d+$/.test(item)) {
       countKey++;
     }
   });
-  
-  const nameCategory = category ? category.name : "Không rõ";
-  
+
+  const nameCategory = category ? category.name : 'Không rõ';
 
   const newData = {
     id: tool.id,
     name: tool.name,
     image: tool.image,
     price: tool.price,
-    list_image: JSON.parse(tool.list_image || "[]"),
+    list_image: JSON.parse(tool.list_image || '[]'),
     description: tool.description,
     slug: tool.slug,
     category_name: nameCategory,
-    quantity: countKey
+    quantity: countKey,
   };
-  console.log(" detail ~ newData:", newData)
+  console.log(' detail ~ newData:', newData);
 
-
-  res.render("service/tool/detail", {
+  res.render('service/tool/detail', {
     tool: newData,
-    title: "Chi tiết " + tool.name,
+    title: 'Chi tiết ' + tool.name,
   });
 };
 
@@ -75,41 +76,64 @@ const create = async (req, res) => {
   res.render('admin/tool/create', { categories: newCategories });
 };
 const createTool = async (req, res) => {
-  console.log(req.body);
   try {
     const data = req.body;
     const slug = createSlug(data.name);
     await db.Tool.create({ ...data, slug });
-    res.send('ok');
+    req.flash('success', 'Tạo tool game thành công');
+    res.redirect('/admin/tool-game');
   } catch (error) {
+    req.flash('error', 'Có lỗi xảy ra');
+    res.redirect('/admin/tool-game');
     console.log(error);
   }
 };
 const listTool = async (req, res) => {
-  const tool = await db.Tool.findAll();
+  try {
+    const currentPage = Number(req.query.page) || 1;
 
-  const categoryIds = [...new Set(tool.map(item => item.category_id))];
-  const categories = await db.Category.findAll({
-    where: { id: categoryIds },
-  });
+    const { items: toolGames, pagination } = await paginate({
+      model: db.Tool,
+      page: currentPage,
+      limit: 10,
+    });
 
-  const categoryMap = {};
-  categories.forEach(cat => categoryMap[cat.id] = cat.name);
+    const categoryIds = [...new Set(toolGames.map((item) => item.category_id))];
+    const categories = await db.Category.findAll({
+      where: { id: categoryIds },
+    });
 
-  const newData = tool.map((item) => {
-    const keyList = item.key_value?.split(',') || [];
-    const availableKeys = keyList.filter(k => !/-true-\d+$/.test(k));
-    return {
-      id: item.id,
-      name: item.name,
-      image: item.image,
-      price: item.price,
-      quantity: availableKeys.length,
-      category_name: categoryMap[item.category_id] || 'Không rõ',
-    };
-  });
+    const categoryMap = {};
+    categories.forEach((cat) => (categoryMap[cat.id] = cat.name));
+    const newData = toolGames.map((item) => {
+      const keyList = item.key_value?.split(',') || [];
+      const countKey = keyList.reduce((acc, key) => {
+        if (!/-true-\d+$/.test(key)) {
+          acc++;
+        }
+        return acc;
+      }, 0);
 
-  res.render('admin/tool/index', { tool: newData, title: 'Quản lý tool game' });
+      return {
+        id: item.id,
+        name: item.name,
+        image: item.image,
+        price: item.price,
+        category_name: categoryMap[item.category_id] || 'Không rõ',
+        quantity: countKey,
+      };
+    });
+
+    res.render('admin/tool/index', {
+      tool: newData,
+      title: 'Quản lý tool game',
+      currentPage: pagination.currentPage,
+      totalPage: pagination.totalPages,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  // res.render('admin/tool/index', { tool: newData, title: 'Quản lý tool game' });
 };
 const update = async (req, res) => {
   try {
@@ -117,7 +141,7 @@ const update = async (req, res) => {
 
     // 1. Tìm tool theo ID
     const tool = await db.Tool.findOne({ where: { id } });
-    if (!tool) return res.status(404).send("Tool not found");
+    if (!tool) return res.status(404).send('Tool not found');
 
     // 2. Lấy danh sách category dạng cây
     const categories = await db.Category.findAll();
@@ -144,7 +168,7 @@ const update = async (req, res) => {
       name: tool.name,
       price: tool.price,
       image: tool.image,
-      list_image: JSON.parse(tool.list_image || "[]"),
+      list_image: JSON.parse(tool.list_image || '[]'),
       status: tool.status,
       category_id: tool.category_id,
       key_value: tool.key_value,
@@ -156,11 +180,11 @@ const update = async (req, res) => {
       toolgame: newData,
       categories: newCategories,
       categoryOptions: selectTree(newCategories, 1, tool.category_id),
-      title: 'Cập nhật tool game'
+      title: 'Cập nhật tool game',
     });
   } catch (error) {
-    console.error("update tool ~ error:", error);
-    res.status(500).send("Lỗi server khi cập nhật tool");
+    console.error('update tool ~ error:', error);
+    res.status(500).send('Lỗi server khi cập nhật tool');
   }
 };
 
@@ -195,7 +219,7 @@ const updateTool = async (req, res) => {
     req.flash('success', 'Cập nhật tool game thành công');
     res.redirect('/admin/tool-game');
   } catch (error) {
-    console.log("updateTool ~ error:", error);
+    console.log('updateTool ~ error:', error);
   }
 };
 const deleteImage = async (req, res) => {
@@ -247,7 +271,7 @@ const deleteTool = async (req, res) => {
   try {
     const id = req.params.id;
     const tool = await db.Tool.findOne({ where: { id: id } });
-    if(!tool) return res.status(404).send("Tool not found");
+    if (!tool) return res.status(404).send('Tool not found');
     if (tool.image) {
       const regex = /(?<=\/)[\w-]+(?=\.\w+$)/;
       const imageName = tool.image.match(regex)[0];
@@ -267,9 +291,9 @@ const deleteTool = async (req, res) => {
     req.flash('success', 'Xóa tool game thành công');
     res.redirect('/admin/tool-game');
   } catch (error) {
-    console.log("deleteTool ~ error:", error);
+    console.log('deleteTool ~ error:', error);
   }
-}
+};
 module.exports = {
   create,
   createTool,
@@ -279,6 +303,5 @@ module.exports = {
   updateTool,
   update,
   deleteImage,
-  deleteTool
-  
+  deleteTool,
 };

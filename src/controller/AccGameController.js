@@ -143,7 +143,7 @@ const createAcc = async (req, res) => {
       method_login,
       description,
       category_id,
-      social_media,
+      contact,
     } = req.body;
     // console.log(" createAcc ~ socal_media:", socal_media)
 
@@ -158,7 +158,7 @@ const createAcc = async (req, res) => {
       slug: createSlug(name),
       method_login,
       category_id,
-      social_media,
+      contact,
       description,
       created_by: userId,
     });
@@ -263,7 +263,7 @@ const updateAccGameByAdmin = async (req, res) => {
         status: accgame.status,
         method_login: accgame.method_login,
         category_id: accgame.category_id,
-        social_media: accgame.social_media,
+        contact: accgame.contact,
         description: accgame.description,
       };
       res.render('admin/accgame/update', {
@@ -324,7 +324,7 @@ const updateByAdmin = async (req, res) => {
     accgame.status = data.status;
     accgame.status_acc = data.status_acc;
     accgame.method_login = data.method_login;
-    accgame.social_media = data.social_media;
+    accgame.contact = data.contact;
     accgame.category_id = data.category_id;
 
     await accgame.save();

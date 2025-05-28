@@ -51,7 +51,7 @@ module.exports = {
       method_login: {
         type: Sequelize.STRING,
       },
-      social_media: {
+      contact: {
         type: Sequelize.STRING,
       },
       createdAt: {

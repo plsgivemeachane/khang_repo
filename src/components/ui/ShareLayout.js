@@ -14,9 +14,6 @@ const clientLayout = async (req, res, next) => {
 
   try {
     let userInfo = await db.User.findOne({ where: { id: userId } });
-    const getRoleId = userInfo.roleId;
-    const role = await db.Role.findOne({ where: { id: getRoleId } });
-    const role_name = role.name;
     
     res.locals.user = userInfo || null;
   } catch (error) {

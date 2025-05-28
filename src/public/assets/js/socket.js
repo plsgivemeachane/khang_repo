@@ -3,7 +3,7 @@ socket.emit('join-room', { roomId: window.roomId, userId: window.userId });
 
 const messagesEl = document.getElementById('messages');
 const input = document.getElementById('messageInput');
-const imageInput = document.getElementById('imageInput'); // input type="file"
+const imageInput = document.getElementById('imageInput');
 const replyToUserSpan = document.getElementById('replyToUser');
 const replyToContentSpan = document.getElementById('replyToContent');
 
@@ -12,8 +12,7 @@ let offset = 0;
 const limit = 10;
 let isLoading = false;
 
-// ==== Xử lý click nút xoá / trả lời ====
-document.addEventListener('click', async function (e) {
+document.addEventListener('click', async (e) => {
   if (e.target.closest('.delete-btn')) {
     const btn = e.target.closest('.delete-btn');
     const chatId = btn.dataset.id;
@@ -24,15 +23,11 @@ document.addEventListener('click', async function (e) {
   }
 
   if (e.target.closest('.reply-btn')) {
-    const btn = e.target.closest('.reply-btn');
-    const chat = btn.closest('.chat-message');
-    if (!chat) return;
+    const chat = e.target.closest('.chat-message');
     replyId = chat.dataset.id;
-    const user = chat.dataset.username;
-    const content = chat.querySelector('.bubble')?.innerText.trim();
-    if (!user || !content) return;
-    replyToUserSpan.innerText = user;
-    replyToContentSpan.innerText = content;
+    replyToUserSpan.innerText = chat.dataset.username;
+    replyToContentSpan.innerText =
+      chat.querySelector('.bubble')?.innerText.trim() || '';
     document.getElementById('replyContext').style.display = 'block';
     input.focus();
   }
@@ -43,11 +38,16 @@ function clearReply() {
   document.getElementById('replyContext').style.display = 'none';
 }
 
-// ==== Gửi tin nhắn (có thể có ảnh) ====
+document
+  .getElementById('chatForm')
+  .addEventListener('submit', async function (e) {
+    e.preventDefault();
+    await sendMessage();
+  });
+
 async function sendMessage() {
   const message = input.value.trim();
   const file = imageInput.files[0];
-
   if (!message && !file) return;
 
   const formData = new FormData();
@@ -57,170 +57,177 @@ async function sendMessage() {
   if (replyId) formData.append('replyId', replyId);
   if (file) formData.append('image', file);
 
-  socket.emit('send-message', {
-    roomId: String(window.roomId),
-    userId: parseInt(window.userId),
-    message,
-    replyId,
-  });
-
-  await fetch('/api/chat/send-chat', {
+  // Gửi đến server
+  const res = await fetch('/api/chat/send-chat', {
     method: 'POST',
     body: formData,
   });
+  const data = await res.json();
+
+  if (data.success) {
+    socket.emit('send-message', {
+      roomId: String(window.roomId),
+      userId: parseInt(window.userId),
+    });
+  }
 
   input.value = '';
   imageInput.value = '';
   clearReply();
 }
 
-// ==== Nhận tin nhắn mới hoặc reload ====
-socket.on('receive-message', async () => {
-  offset = 0;
-  messagesEl.innerHTML = '';
-  await loadChats();
+// Nhận realtime tin nhắn mới (từ socket)
+socket.on('new-chat', ({ chat }) => {
+  renderChat(chat, false);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 });
 
-// ==== Nhận cập nhật realtime danh sách đã xem ====
+// Realtime cập nhật người đã xem
 socket.on('message-seen-update', ({ chatId, seenUsers }) => {
   const wrapper = document.querySelector(`.chat-message[data-id="${chatId}"]`);
-  if (!wrapper || !Array.isArray(seenUsers) || seenUsers.length === 0) return;
+  if (!wrapper || !Array.isArray(seenUsers)) return;
 
   let seenWrapper = wrapper.querySelector('.seen-users');
   if (!seenWrapper) {
     seenWrapper = document.createElement('div');
-    seenWrapper.className = 'seen-users d-flex align-items-center text-muted small mt-1 ms-2';
-
+    seenWrapper.className =
+      'seen-users d-flex align-items-center text-muted small mt-1 ms-2';
     const eyeIcon = document.createElement('i');
     eyeIcon.className = 'bi bi-eye-fill me-1';
     seenWrapper.appendChild(eyeIcon);
-
     const seenText = document.createElement('span');
     seenText.className = 'seen-usernames';
     seenWrapper.appendChild(seenText);
-
     wrapper.appendChild(seenWrapper);
   }
 
-  const seenText = seenWrapper.querySelector('.seen-usernames');
-  seenText.textContent = seenUsers.join(', ');
+  seenWrapper.querySelector('.seen-usernames').textContent =
+    seenUsers.join(', ');
 });
 
-// ==== Load tin nhắn (có phân trang) ====
+// Hàm load tin nhắn cũ
 async function loadChats(isPrepend = false) {
   if (isLoading) return;
   isLoading = true;
 
-  const res = await fetch(`/api/chat/list/${window.roomId}?limit=${limit}&offset=${offset}`);
+  const res = await fetch(
+    `/api/chat/list/${window.roomId}?limit=${limit}&offset=${offset}`
+  );
   const chats = await res.json();
+  const scrollBefore = messagesEl.scrollHeight;
+  const fragment = document.createDocumentFragment();
 
-  if (Array.isArray(chats)) {
-    const scrollBefore = messagesEl.scrollHeight;
-    const fragment = document.createDocumentFragment();
+  chats.reverse().forEach((chat) => renderChat(chat, isPrepend, fragment));
 
-    chats.reverse().forEach((chat) => {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('chat-message', chat.userSenderId == window.userId ? 'own' : 'other');
-      wrapper.dataset.id = chat.id;
-      wrapper.dataset.username = chat.users?.username;
-
-      const bubble = document.createElement('div');
-      bubble.classList.add('bubble');
-
-      if (chat.replyMessage) {
-        const replyPreview = document.createElement('div');
-        replyPreview.classList.add('reply-preview');
-        replyPreview.innerText = `Trả lời ${chat.replyMessage.users?.username}: "${chat.replyMessage.content}"`;
-        bubble.appendChild(replyPreview);
-      }
-
-      if (chat.imageUrl) {
-        const img = document.createElement('img');
-        img.src = chat.imageUrl;
-        img.alt = 'uploaded image';
-        img.className = 'img-thumbnail mb-2';
-        img.style.maxWidth = '200px';
-        bubble.appendChild(img);
-      }
-
-      if (chat.content) {
-        const text = document.createTextNode(chat.content);
-        bubble.appendChild(text);
-      }
-
-      wrapper.appendChild(bubble);
-
-      const actions = document.createElement('div');
-      actions.classList.add('message-actions');
-
-      const replyBtn = document.createElement('div');
-      replyBtn.className = 'icon-circle reply-btn';
-      replyBtn.dataset.id = chat.id;
-      replyBtn.dataset.user = chat.users?.username;
-      replyBtn.innerHTML = '<i class="bi bi-reply"></i>';
-      actions.appendChild(replyBtn);
-
-      if (chat.userSenderId == window.userId) {
-        const delBtn = document.createElement('div');
-        delBtn.className = 'icon-circle delete-btn';
-        delBtn.dataset.id = chat.id;
-        delBtn.innerHTML = '<i class="bi bi-trash"></i>';
-        actions.appendChild(delBtn);
-      }
-
-      wrapper.appendChild(actions);
-
-      if (!chat.chatReads?.some((r) => r.userId == window.userId)) {
-        fetch('/api/chat/mark-read', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chatId: chat.id, userId: window.userId }),
-        });
-      }
-
-      if (chat.chatReads?.length > 0) {
-        const seenWrapper = document.createElement('div');
-        seenWrapper.className = 'seen-users d-flex align-items-center text-muted small mt-1 ms-2';
-
-        const eyeIcon = document.createElement('i');
-        eyeIcon.className = 'bi bi-eye-fill me-1';
-        seenWrapper.appendChild(eyeIcon);
-
-        const seenUsers = chat.chatReads
-          .map((read) => read.user?.username)
-          .filter(Boolean)
-          .join(', ');
-
-        const seenText = document.createElement('span');
-        seenText.className = 'seen-usernames';
-        seenText.textContent = seenUsers;
-        seenWrapper.appendChild(seenText);
-
-        wrapper.appendChild(seenWrapper);
-      }
-
-      isPrepend ? fragment.prepend(wrapper) : fragment.appendChild(wrapper);
-    });
-
-    if (isPrepend) {
-      messagesEl.prepend(fragment);
-      messagesEl.scrollTop = messagesEl.scrollHeight - scrollBefore;
-    } else {
-      messagesEl.appendChild(fragment);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    offset += chats.length;
+  if (isPrepend) {
+    messagesEl.prepend(fragment);
+    messagesEl.scrollTop = messagesEl.scrollHeight - scrollBefore;
+  } else {
+    messagesEl.appendChild(fragment);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  offset += chats.length;
   isLoading = false;
 }
 
-// ==== Kéo lên để tải thêm ====
-messagesEl.addEventListener('scroll', () => {
-  if (messagesEl.scrollTop === 0) {
-    loadChats(true);
+function renderChat(chat, isPrepend = false, target = messagesEl) {
+  const wrapper = document.createElement('div');
+  wrapper.classList.add(
+    'chat-message',
+    chat.userSenderId == window.userId ? 'own' : 'other'
+  );
+  wrapper.dataset.id = chat.id;
+  wrapper.dataset.username = chat.users?.username;
+
+  const bubble = document.createElement('div');
+  bubble.classList.add('bubble');
+
+  if (chat.replyMessage) {
+    const replyPreview = document.createElement('div');
+    replyPreview.classList.add('reply-preview');
+    replyPreview.innerText = `Trả lời ${chat.replyMessage.users?.username}: "${
+      chat.replyMessage.content || ''
+    }"`;
+    bubble.appendChild(replyPreview);
   }
+
+  if (chat.imageUrl) {
+    const img = document.createElement('img');
+    img.src = chat.imageUrl;
+    img.alt = 'uploaded image';
+    img.className = 'img-thumbnail mb-2';
+    img.style.maxWidth = '200px';
+    bubble.appendChild(img);
+  }
+
+  if (chat.content) {
+    const text = document.createTextNode(chat.content);
+    bubble.appendChild(text);
+  }
+
+  const sender = document.createElement('div');
+  sender.className = 'small text-muted';
+  sender.innerText = chat.users?.username || '';
+  wrapper.appendChild(sender);
+
+  wrapper.appendChild(bubble);
+
+  const actions = document.createElement('div');
+  actions.classList.add('message-actions');
+
+  const replyBtn = document.createElement('div');
+  replyBtn.className = 'icon-circle reply-btn';
+  replyBtn.dataset.id = chat.id;
+  replyBtn.dataset.user = chat.users?.username;
+  replyBtn.innerHTML = '<i class="bi bi-reply"></i>';
+  actions.appendChild(replyBtn);
+
+  if (chat.userSenderId == window.userId) {
+    const delBtn = document.createElement('div');
+    delBtn.className = 'icon-circle delete-btn';
+    delBtn.dataset.id = chat.id;
+    delBtn.innerHTML = '<i class="bi bi-trash"></i>';
+    actions.appendChild(delBtn);
+  }
+
+  wrapper.appendChild(actions);
+
+  if (!chat.chatReads?.some((r) => r.userId == window.userId)) {
+    fetch('/api/chat/mark-read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chatId: chat.id, userId: window.userId }),
+    });
+  }
+
+  if (chat.chatReads?.length > 0) {
+    const seenWrapper = document.createElement('div');
+    seenWrapper.className = 'seen-users small mt-1 ms-2';
+
+    const eyeIcon = document.createElement('i');
+    eyeIcon.className = 'bi bi-eye-fill me-1 text-primary';
+    seenWrapper.appendChild(eyeIcon);
+
+    const seenList = document.createElement('span');
+    seenList.className = 'seen-usernames';
+    seenList.innerHTML = chat.chatReads
+      .map((r) => r.user?.username)
+      .filter(Boolean)
+      .map(
+        (name) => `<span class="badge bg-light text-dark me-1">${name}</span>`
+      )
+      .join('');
+    seenWrapper.appendChild(seenList);
+
+    wrapper.appendChild(seenWrapper);
+  }
+
+  isPrepend ? target.prepend(wrapper) : target.appendChild(wrapper);
+}
+
+messagesEl.addEventListener('scroll', () => {
+  if (messagesEl.scrollTop === 0) loadChats(true);
 });
 
 loadChats();

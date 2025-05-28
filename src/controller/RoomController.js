@@ -5,10 +5,15 @@ const createRoom = async (req, res) => {
   console.log(" createRoom ~ userId:", userId)
   const {name,password} = req.body;
   const roomId = Math.floor(Math.random() * 10000000); 
-  console.log(" createRoom ~ password:", password)
-  console.log(" createRoom ~ name:", name)
+  
+  const priceRoom = 10000;
   try {
     await db.Room.create({name,password,createdBy:userId,roomId,isGroup:true,member:[userId]});
+    await db.Room.update({member:JSON.stringify([userId])},{where:{roomId:roomId}});
+    const currentAsset = await db.User.findOne({where:{id:userId}});
+    const newAsset = currentAsset.asset - priceRoom;
+    await db.User.update({asset:newAsset},{where:{id:userId}});
+    
     res.status(200).send("Thanh cong");
   } catch (error) {
     console.log(error);
@@ -72,9 +77,7 @@ const index = async (req, res) => {
   const userId = req.user.id;
   const rooms = await db.Room.findAll({ where: { isGroup: true } });
 
-  if (!rooms || rooms.length === 0) {
-    return res.status(404).send("Không có phòng nào tồn tại");
-  }
+
 
   // Lọc những room mà user là thành viên
   const joinedRooms = rooms.filter(room => {
@@ -86,9 +89,6 @@ const index = async (req, res) => {
     }
   });
 
-  if (joinedRooms.length === 0) {
-    return res.status(403).send("Bạn chưa tham gia phòng nào");
-  }
 
   res.render("more/room", {
     title: "Danh sách phòng chat",

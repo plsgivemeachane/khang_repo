@@ -33,17 +33,23 @@ if (userAsset) {
     ','
   );
 }
-signUp.addEventListener('click', () => {
-  signInContainer.classList.add('right-panel-active');
-});
-signIn.addEventListener('click', () => {
-  signInContainer.classList.remove('right-panel-active');
-});
-closeBtn.forEach((item) => {
-  item.addEventListener('click', () => {
+if (signUp) {
+  signUp.addEventListener('click', () => {
+    signInContainer.classList.add('right-panel-active');
+  });
+}
+if (signIn) {
+  signIn.addEventListener('click', () => {
     signInContainer.classList.remove('right-panel-active');
   });
-});
+}
+if (closeBtn) {
+  closeBtn.forEach((item) => {
+    item.addEventListener('click', () => {
+      signInContainer.classList.remove('right-panel-active');
+    });
+  });
+}
 if (overlayModal) {
   overlayModal.addEventListener('click', () => {
     signInContainer.classList.remove('right-panel-active');
@@ -78,8 +84,10 @@ formRegister.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
+    console.log(' formRegister.addEventListener ~ response:', response);
 
     const result = await response.json();
+    console.log(' formRegister.addEventListener ~ result:', result);
     if (response.ok) {
       Toastify({
         text: 'Đăng ký thành công',
@@ -94,7 +102,7 @@ formRegister.addEventListener('submit', async (e) => {
       document.getElementById('signIn').click(); // chuyển sang tab đăng nhập
     } else {
       Toastify({
-        text: 'Có lỗi xảy ra',
+        text: result.message || 'Có lỗi xảy ra',
         duration: 3000,
         gravity: 'top',
         position: 'right',
@@ -106,7 +114,7 @@ formRegister.addEventListener('submit', async (e) => {
   } catch (error) {
     console.error('Lỗi đăng ký:', error);
     Toastify({
-      text: 'Có lỗi xảy ra',
+      text: error.message || 'Có lỗi xảy ra',
       duration: 3000,
       gravity: 'top',
       position: 'right',
@@ -216,7 +224,7 @@ $(document).ready(function () {
         element.attr('style', 'overflow: visible;'); // Reset to visible when expanded
         // Remove the hidden content from the DOM
         const hiddenContent = element.find('.readmore-js-collapsed');
-        console.log(" hiddenContent:", hiddenContent)
+        console.log(' hiddenContent:', hiddenContent);
         if (hiddenContent.length) {
           hiddenContent.remove(); // Remove the hidden content
         }

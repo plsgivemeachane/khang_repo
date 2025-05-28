@@ -6,9 +6,9 @@ tinymce.init({
   menubar: "file edit view format tools table help",
   height: 500,
   plugins:
-    "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker",
+    "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker fullscreen",
   toolbar:
-    "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
+    "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat | fullscreen",
   image_title: true,
   automatic_uploads: true,
   file_picker_types: "image",

@@ -1,0 +1,114 @@
+<div class="py-4">
+  <h1 class="text-primary text-center">Cập nhập người dùng</h1>
+  <form
+    action="/admin/nguoi-dung/cap-nhat/<%= user.id %>?_method=PATCH"
+    method="POST"
+    class="mt-4 w-75 mx-auto formSubmit"
+    autocomplete="off"
+    enctype="multipart/form-data"
+    id="user-form"
+  >
+    <div class="row">
+      <!-- Tên sản phẩm -->
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label class="form-label">Tên người dùng</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nhập tên người dùng"
+            name="username"
+            value="<%= user.username %>"
+          />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group mb-3">
+          <label class="form-label">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            placeholder="Nhập email người dùng"
+            name="email"
+            value="<%= user.email %>"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+        <!-- Tên sản phẩm -->
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">SĐT</label>
+            <input
+              type="tel"
+              class="form-control"
+              placeholder="Nhập số điện thoại người dùng"
+              name="phoneNumber"
+              value="<%= user.phoneNumber %>"
+            />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Mô tả</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nhập mô tả người dùng"
+              name="bio"
+              value="<%= user.bio %>"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <!-- Tên sản phẩm -->
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label">Role</label>
+            <select name="roleId" class="form-select">
+                <% roles.forEach(role => { %>
+                  <option value="<%= role.id %>" <%= role.id === user.roleId ? 'selected' : '' %>>
+                    <%= role.name %>
+                  </option>
+                <% }) %>
+              </select>
+              
+          </div>
+        </div>
+       <div class="col-md-6">
+        <label for="" class="form-label">Avatar</label>
+        <input
+              type="file"
+              class="form-control"
+              name="avatar"
+              id="main-image"
+              accept="image/*"
+            />
+            <img
+              id="preview-main"
+              class="preview-image mt-2 d-none"
+              width="100"
+            />
+            <% if (user.avatar) { %>
+              <div class="image-item">
+                <img
+                  src="<%= user.avatar %>"
+                  width="100"
+                  class="preview-image mt-2"
+                  data-image="<%= user.avatar %>"
+                  
+                />
+                
+              
+              </div>
+            <% } %>
+       </div>
+      </div>
+
+    <button type="submit" class="btn btn-success btn-submit">
+      Cập nhật 
+    </button>
+  </form>
+</div>

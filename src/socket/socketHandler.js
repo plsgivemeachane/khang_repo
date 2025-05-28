@@ -1,115 +1,108 @@
+// socket/socketHandler.js
 const db = require('../models');
 
-// Dùng để theo dõi user nào đang ở phòng nào
 const onlineUsers = {}; // socket.id -> { userId, roomId }
 
 module.exports = function (io) {
   io.on('connection', (socket) => {
     console.log('✅ Socket connected:', socket.id);
-
     socket.on('join-room', async ({ roomId, userId }) => {
+      if (!roomId || !userId) {
+        console.warn(`⚠️ join-room received invalid data: roomId=${roomId}, userId=${userId}`);
+        return;
+      }
+    
       socket.join(roomId);
       onlineUsers[socket.id] = { userId, roomId };
-
-      console.log(`✅ User ${userId} joined room ${roomId}`);
-      socket.emit('joined-success', { roomId, userId });
-
-      // ✅ Đánh dấu tất cả tin nhắn hiện có là đã xem
+    
       try {
         const room = await db.Room.findOne({ where: { roomId } });
         if (!room) return;
-
-        // Tìm tất cả tin nhắn chưa được user này đọc
+    
         const chats = await db.Chat.findAll({
           where: { groupId: room.id },
-          include: [
-            {
-              model: db.ChatRead,
-              as: 'chatReads',
-              where: { userId },
-              required: false,
-            },
-          ],
+          include: [{
+            model: db.ChatRead,
+            as: 'chatReads',
+            where: { userId },
+            required: false,
+          }],
         });
-
-        const unreadChats = chats.filter(
-          (chat) => !chat.chatReads || chat.chatReads.length === 0
-        );
-
-        // Tạo tất cả bản ghi ChatRead cùng lúc
-        const readRecords = unreadChats.map((chat) => ({
+    
+        const unreadChats = chats.filter(chat => !chat.chatReads || chat.chatReads.length === 0);
+        const readRecords = unreadChats.map(chat => ({
           chatId: chat.id,
           userId,
-          seenAt: new Date(), // 👈 Cập nhật chính xác thời gian đã xem
+          seenAt: new Date(),
         }));
-
+    
         if (readRecords.length > 0) {
           await db.ChatRead.bulkCreate(readRecords, {
-            ignoreDuplicates: true, // tránh tạo trùng
+            ignoreDuplicates: true,
           });
-          console.log(
-            `✅ Marked ${readRecords.length} chats as read for user ${userId}`
-          );
         }
       } catch (err) {
         console.error('❌ Error auto-marking as read on join:', err);
       }
     });
+    
 
-    socket.on('send-message', async ({ roomId, userId, message, replyId }) => {
+    socket.on('send-message', async ({ roomId, userId }) => {
+      if(!roomId || !userId) return;
       try {
-        const user = await db.User.findByPk(userId);
         const room = await db.Room.findOne({ where: { roomId } });
         if (!room) return;
 
-        const chat = await db.Chat.create({
-          groupId: room.id,
-          userSenderId: userId,
-          content: message,
-          replyId: replyId || null,
+        const latestChat = await db.Chat.findOne({
+          where: { groupId: room.id },
+          order: [['createdAt', 'DESC']],
+          include: [
+            { model: db.User, as: 'users', attributes: ['id', 'username'] },
+            {
+              model: db.Chat,
+              as: 'replyMessage',
+              include: [{ model: db.User, as: 'users', attributes: ['username'] }],
+            },
+            {
+              model: db.ChatRead,
+              as: 'chatReads',
+              include: [{ model: db.User, as: 'user', attributes: ['username'] }],
+            },
+          ],
         });
 
-        // Emit tin nhắn mới cho tất cả trong phòng
-        io.to(roomId).emit('receive-message');
-
-        // Đánh dấu đã xem cho các user khác đang online
         const sockets = await io.in(roomId).fetchSockets();
-        const seenUserIds = new Set();
-
-        const newSeenUsers = [];
+        const seenUsernames = [];
 
         for (const s of sockets) {
           const info = onlineUsers[s.id];
-          if (info && info.userId !== userId && !seenUserIds.has(info.userId)) {
-            seenUserIds.add(info.userId);
-
-            const chatRead = await db.ChatRead.create({
-              chatId: chat.id,
-              userId: info.userId,
-              seenAt: new Date(),
+          if (info && info.userId !== userId) {
+            const exist = await db.ChatRead.findOne({
+              where: { chatId: latestChat.id, userId: info.userId },
             });
 
-            const seenUser = await db.User.findByPk(info.userId);
-            newSeenUsers.push(seenUser.username); // 👈 lấy tên user để hiển thị
+            if (!exist) {
+              await db.ChatRead.create({
+                chatId: latestChat.id,
+                userId: info.userId,
+                seenAt: new Date(),
+              });
+            }
+
+            const u = await db.User.findByPk(info.userId);
+            if (u?.username) seenUsernames.push(u.username);
           }
         }
 
-        // 🔁 Gửi lại cho client của người gửi biết ai đã seen
-        socket.emit('message-seen-update', {
-          chatId: chat.id,
-          seenUsers: newSeenUsers,
+        io.to(roomId).emit('new-chat', {
+          chat: {
+            ...latestChat.toJSON(),
+            chatReads: seenUsernames.map((username) => ({ user: { username } })),
+          },
         });
       } catch (err) {
         console.error('❌ Error in send-message:', err);
       }
-    });
-
-    socket.on('requestSeller', (data) => {
-      console.log('📩 Người dùng gửi yêu cầu trở thành seller:', data);
-      io.emit('notifyAdmin', {
-        message: `User ID ${data.userId} đã gửi yêu cầu seller.`,
-        userId: data.userId,
-      });
     });
 
     socket.on('disconnect', () => {

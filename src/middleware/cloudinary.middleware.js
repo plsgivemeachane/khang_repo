@@ -25,6 +25,10 @@ module.exports.cloud = async (req, res, next) => {
     if (req.files["image"]) {
       req.body.image = await uploadSingleImage(req.files["image"][0]);
     }
+    
+    if (req.files["avatar"]) {
+      req.body.avatar = await uploadSingleImage(req.files["avatar"][0]);
+    }
 
     if (req.files["list_image"]) {
       console.log(12);

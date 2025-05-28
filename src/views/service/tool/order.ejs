@@ -54,7 +54,16 @@
       contentType: 'application/json', // Gửi JSON
       data: JSON.stringify(payload),
       success: function (response) {
-        alert('Đặt mua thành công!');
+        Toastify({
+          text: 'Mua thành công',
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          style: {
+            background: '#26e6a3',
+          },
+        }).showToast();
+        window.location.href = '/don-hang/lich-su-mua';
       },
       error: function (err) {
         console.error(err);

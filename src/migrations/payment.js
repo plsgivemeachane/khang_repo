@@ -16,6 +16,8 @@ module.exports = {
           model: 'Users',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
 
       payment_content: {
