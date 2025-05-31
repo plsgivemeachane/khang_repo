@@ -1,15 +1,19 @@
 const db = require("../models");
 const createRoom = async (req, res) => {
   console.log(" createRoom ~ req.body:", req.body)
+  let memberId=[]
   const userId = req.user.id;
-  console.log(" createRoom ~ userId:", userId)
+  const roleAdmin = await db.Role.findOne({where:{name:"Admin"}});
+  const arrUserIdRoleAdmin = await db.User.findOne({where:{roleId:roleAdmin.id}});
+  memberId.push(arrUserIdRoleAdmin.id);
+
   const {name,password} = req.body;
   const roomId = Math.floor(Math.random() * 10000000); 
   
   const priceRoom = 10000;
   try {
     await db.Room.create({name,password,createdBy:userId,roomId,isGroup:true,member:[userId]});
-    await db.Room.update({member:JSON.stringify([userId])},{where:{roomId:roomId}});
+    await db.Room.update({member:([userId,...memberId])},{where:{roomId:roomId}});
     const currentAsset = await db.User.findOne({where:{id:userId}});
     const newAsset = currentAsset.asset - priceRoom;
     await db.User.update({asset:newAsset},{where:{id:userId}});

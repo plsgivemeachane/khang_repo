@@ -16,13 +16,16 @@ const DashboardRouter = require('./admin/DashboardRouter');
 const { decodedToken } = require('../service/jwt');
 const { authLayout, clientLayout, adminLayout } = require('../components/ui/ShareLayout');
 const CheckProtectRoutes = require('../middleware/protect-routes');
+const NotificationRouter = require('./api/NotificationRouter');
 
 module.exports = (app) => {
   // Route không cần middleware
   app.use('/', homeRouter); 
 
   app.use('/tai-khoan', authRouter);
+  // api
   app.use('/api/chat', ChatApiRouter)
+  app.use('/api/notification', NotificationRouter)
 
   // Group middleware: decodedToken + clientLayout
   const clientGroup = express.Router();
