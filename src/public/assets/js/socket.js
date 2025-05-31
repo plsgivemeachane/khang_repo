@@ -197,7 +197,7 @@ function renderChat(chat, isPrepend = false, target = messagesEl) {
     fetch('/api/chat/mark-read', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chatId: chat.id, userId: window.userId }),
+      body: JSON.stringify({ chatId: chat.id, userId:Number( window.userId )}),
     });
   }
 

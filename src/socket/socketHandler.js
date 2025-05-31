@@ -1,4 +1,3 @@
-// socket/socketHandler.js
 const db = require('../models');
 
 const onlineUsers = {}; // socket.id -> { userId, roomId }
@@ -6,19 +5,18 @@ const onlineUsers = {}; // socket.id -> { userId, roomId }
 module.exports = function (io) {
   io.on('connection', (socket) => {
     console.log('✅ Socket connected:', socket.id);
+
     socket.on('join-room', async ({ roomId, userId }) => {
-      if (!roomId || !userId) {
-        console.warn(`⚠️ join-room received invalid data: roomId=${roomId}, userId=${userId}`);
-        return;
-      }
-    
+      if (!roomId || !userId) return;
+
       socket.join(roomId);
       onlineUsers[socket.id] = { userId, roomId };
-    
+
       try {
         const room = await db.Room.findOne({ where: { roomId } });
         if (!room) return;
-    
+
+        // Đánh dấu đã đọc các tin nhắn chưa đọc
         const chats = await db.Chat.findAll({
           where: { groupId: room.id },
           include: [{
@@ -28,27 +26,72 @@ module.exports = function (io) {
             required: false,
           }],
         });
-    
+
         const unreadChats = chats.filter(chat => !chat.chatReads || chat.chatReads.length === 0);
         const readRecords = unreadChats.map(chat => ({
           chatId: chat.id,
           userId,
           seenAt: new Date(),
         }));
-    
+
         if (readRecords.length > 0) {
-          await db.ChatRead.bulkCreate(readRecords, {
-            ignoreDuplicates: true,
+          await db.ChatRead.bulkCreate(readRecords, { ignoreDuplicates: true });
+        }
+
+        // ✅ Cập nhật tất cả notification message của roomId => isRead = true
+        await db.Notification.update(
+          { isRead: true },
+          {
+            where: {
+              userId,
+              type: 'message',
+              isRead: false,
+              data: {
+                roomId: roomId
+              }
+            }
+          }
+        );
+
+        socket.emit('room-unread-count', { roomId, count: 0 });
+      } catch (err) {
+        console.error('❌ Error in join-room:', err);
+      }
+    });
+
+    socket.on('join-room-overview', async ({ userId }) => {
+      if (!userId) return;
+      onlineUsers[socket.id] = { userId };
+
+      try {
+        const rooms = await db.Room.findAll();
+
+        for (const room of rooms) {
+          const chats = await db.Chat.findAll({
+            where: { groupId: room.id },
+            include: [{
+              model: db.ChatRead,
+              as: 'chatReads',
+              where: { userId },
+              required: false,
+            }]
+          });
+
+          const unreadCount = chats.filter(chat => !chat.chatReads || chat.chatReads.length === 0).length;
+
+          socket.emit('room-unread-count', {
+            roomId: room.roomId,
+            count: unreadCount,
           });
         }
       } catch (err) {
-        console.error('❌ Error auto-marking as read on join:', err);
+        console.error('❌ Error in join-room-overview:', err);
       }
     });
-    
 
     socket.on('send-message', async ({ roomId, userId }) => {
-      if(!roomId || !userId) return;
+      if (!roomId || !userId) return;
+
       try {
         const room = await db.Room.findOne({ where: { roomId } });
         if (!room) return;
@@ -97,9 +140,36 @@ module.exports = function (io) {
         io.to(roomId).emit('new-chat', {
           chat: {
             ...latestChat.toJSON(),
-            chatReads: seenUsernames.map((username) => ({ user: { username } })),
+            chatReads: seenUsernames.map(username => ({ user: { username } })),
           },
         });
+
+        // 🔔 Tạo notification nếu user chưa online trong phòng
+        const members = JSON.parse(room.member || '[]');
+
+        for (const memberId of members) {
+          if (parseInt(memberId) === parseInt(userId)) continue;
+
+          const isInRoom = Object.values(onlineUsers).some(
+            u => u.userId === memberId && u.roomId === roomId
+          );
+
+          if (!isInRoom) {
+            await db.Notification.create({
+              userId: memberId,
+              type: 'message',
+              title: 'Tin nhắn mới',
+              content: latestChat.content || '[Hình ảnh]',
+              data: {
+                chatId: latestChat.id,
+                roomId: roomId,
+                sender: latestChat.users?.username,
+              },
+              isRead: false,
+            });
+          }
+        }
+
       } catch (err) {
         console.error('❌ Error in send-message:', err);
       }

@@ -70,15 +70,16 @@
 
       <ul class="list-group room-list" id="roomList">
         <!-- JS render room list -->
-
         <% rooms.forEach(room => { %>
         <a
           href="/phong-chat/chat/<%= room.roomId %>"
           class="list-group-item d-flex justify-content-between align-items-center"
+          data-room-id="<%= room.roomId %>"
         >
           <%= room.name %>
-          <span class="badge bg-primary rounded-pill" style="display: none">0</span>
-
+          <span class="badge bg-primary rounded-pill" style="display: none"
+            >0</span
+          >
         </a>
         <% }) %>
       </ul>
@@ -155,18 +156,91 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  const socket = io();
-  socket.emit('join-room-overview', { userId: window.userId });
+       const socket = io();
+      const userId = window.userId || <%= user?.id || 'null' %>;
+      const audioNotification = new Audio('/assets/sound/chat.mp3');
+      let audioAllowed = false;
+      document.addEventListener('click', () => {
+      audioAllowed = true;
+    });
 
-  // Khi có room nào có tin nhắn mới chưa đọc
-  socket.on('room-unread-count', ({ roomId, count }) => {
-    const badge = document.querySelector(`a[href$="/${roomId}"] .badge`);
-    if (badge) {
-      badge.textContent = count;
-      badge.style.display = count > 0 ? 'inline-block' : 'none';
-    }
-  });
+      const previousCounts = {}; // Lưu số lượng chưa đọc trước đó cho từng room
+
+      if (userId) {
+        function emitRoomOverview() {
+          socket.emit('join-room-overview', { userId });
+        }
+
+        emitRoomOverview();
+        setInterval(emitRoomOverview, 2000);
+
+        socket.on('room-unread-count', ({ roomId, count }) => {
+          const roomItems = document.querySelectorAll('#roomList a');
+
+          roomItems.forEach((item) => {
+            if (item.dataset.roomId === String(roomId)) {
+              const badge = item.querySelector('span.badge');
+            if(audioAllowed){
+              // 🔔 Phát âm thanh nếu số unread tăng
+              if (previousCounts[roomId] !== undefined && count > previousCounts[roomId]) {
+                console.log(123);
+                audioNotification.play().catch((err) => {
+                  // Chrome block auto-play, only works after user interaction
+                  console.warn('🔇 Audio play blocked or error:', err);
+                });
+              }
+
+            }
+
+              // Lưu lại count hiện tại
+              previousCounts[roomId] = count;
+
+              // Hiển thị badge
+              if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+                badge.classList.add('badge-flash');
+              } else {
+                badge.style.display = 'none';
+                badge.classList.remove('badge-flash');
+              }
+            }
+          });
+        });
+      }
+
+        document
+          .getElementById('createRoomForm')
+          .addEventListener('submit', function (e) {
+            e.preventDefault();
+            const name = this.name.value;
+            const password = this.password.value;
+
+            fetch('/phong-chat/tao-phong', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, password }),
+            }).then((res) => {
+              if (res.ok) location.reload();
+            });
+          });
+
+        document
+          .getElementById('joinRoomForm')
+          .addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const roomId = this.roomId.value;
+            const password = this.password.value;
+            const formData = { roomId, password };
+            fetch('/phong-chat/vao-phong', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(formData),
+            }).then((res) => {
+              if (res.ok) location.reload();
+            });
+          });
 </script>

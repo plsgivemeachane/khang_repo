@@ -232,35 +232,3 @@ $(document).ready(function () {
     },
   });
 });
-document
-  .getElementById('createRoomForm')
-  .addEventListener('submit', function (e) {
-    e.preventDefault();
-    const name = this.name.value;
-    const password = this.password.value;
-
-    fetch('/phong-chat/tao-phong', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password }),
-    }).then((res) => {
-      if (res.ok) location.reload();
-    });
-  });
-
-document
-  .getElementById('joinRoomForm')
-  .addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const roomId = this.roomId.value;
-    const password = this.password.value;
-    const formData = { roomId, password };
-    fetch('/phong-chat/vao-phong', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    }).then((res) => {
-      if (res.ok) location.reload();
-    });
-  });
