@@ -12,15 +12,28 @@ let offset = 0;
 const limit = 10;
 let isLoading = false;
 
+// 📌 Khi click nút xóa
 document.addEventListener('click', async (e) => {
   if (e.target.closest('.delete-btn')) {
     const btn = e.target.closest('.delete-btn');
     const chatId = btn.dataset.id;
     if (confirm('Xóa tin nhắn này?')) {
       await fetch(`/api/chat/delete/${chatId}`, { method: 'DELETE' });
-      btn.closest('.chat-message').remove();
+      btn.closest('.chat-message')?.remove();
+
+      // ✅ Gửi socket để cập nhật cho người khác
+      socket.emit('delete-message', {
+        chatId,
+        roomId: window.roomId,
+      });
     }
   }
+
+  // 📌 Lắng nghe tin nhắn bị xóa từ server
+  socket.on('message-deleted', ({ chatId }) => {
+    const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
+    if (msg) msg.remove();
+  });
 
   if (e.target.closest('.reply-btn')) {
     const chat = e.target.closest('.chat-message');
@@ -197,7 +210,7 @@ function renderChat(chat, isPrepend = false, target = messagesEl) {
     fetch('/api/chat/mark-read', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chatId: chat.id, userId:Number( window.userId )}),
+      body: JSON.stringify({ chatId: chat.id, userId: Number(window.userId) }),
     });
   }
 

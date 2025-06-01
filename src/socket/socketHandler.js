@@ -174,6 +174,9 @@ module.exports = function (io) {
         console.error('❌ Error in send-message:', err);
       }
     });
+    socket.on('delete-message', ({ chatId, roomId }) => {
+      socket.to(roomId).emit('message-deleted', { chatId });
+    });
 
     socket.on('disconnect', () => {
       delete onlineUsers[socket.id];
