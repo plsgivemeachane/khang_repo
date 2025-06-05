@@ -41,11 +41,4 @@ jobs:
             npm install --production
             pm2 stop khang-app
             pm2 start khang-app
-      # - name: Install dependencies & restart pm2
-      #   run: |
-      #     ssh -i ~/.ssh/id_ed25519 root@38.247.64.73 << 'EOF'
-      #       cd /root/khang
-      #       npm install --production
-      #       pm2 stop khang-app
-      #       pm2 start khang-app
-      #     EOF
+
