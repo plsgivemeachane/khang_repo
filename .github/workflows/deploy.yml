@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        
 
       - name: Setup SSH
         run: |
@@ -24,18 +25,18 @@ jobs:
       - name: Sync files to server via rsync
         run: |
           rsync -az -e "ssh -i ~/.ssh/id_ed25519" ./ root@38.247.64.73:/root/khang
-      - name: Execute remote SSH commands using SSH key
-        uses: appleboy/ssh-action@v1
-        with:
-          host: 38.247.64.73
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            cd /root/khang
-            npm install --production
-            pm2 stop khang-app
-            pm2 start khang-app
+      # - name: Execute remote SSH commands using SSH key
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: 38.247.64.73
+      #     username: root
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     port: 22
+      #     script: |
+      #       cd /root/khang
+      #       npm install --production
+      #       pm2 stop khang-app
+      #       pm2 start khang-app
       # - name: Install dependencies & restart pm2
       #   run: |
       #     ssh -i ~/.ssh/id_ed25519 root@38.247.64.73 << 'EOF'
