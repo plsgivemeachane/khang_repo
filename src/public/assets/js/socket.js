@@ -45,10 +45,11 @@ socket.on('message-deleted', ({ chatId }) => {
 });
 
 // Nhận sự kiện xóa hoàn toàn reply
+// Khi server yêu cầu xóa hẳn tin nhắn (reply)
 socket.on('force-remove-message', ({ chatId }) => {
   const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
   if (msg) {
-    msg.remove();
+    msg.remove(); // ← đoạn này đúng
   }
 });
 
@@ -61,7 +62,7 @@ document.addEventListener('click', async (e) => {
       await fetch(`/api/chat/delete/${chatId}`, { method: 'DELETE' });
 
       const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
-      if (msg) msg.remove(); // ✅ Xóa tại chỗ UI của người gửi
+      if (msg) msg.remove();
 
       socket.emit('delete-message', {
         chatId,
@@ -186,15 +187,14 @@ function renderChat(chat, isPrepend = false, target = messagesEl) {
 
   const bubble = document.createElement('div');
   bubble.classList.add('bubble');
-
-  if (chat.replyMessage) {
+  if (chat.replyMessage && chat.replyMessage.content && chat.replyMessage.users?.username) {
     const replyPreview = document.createElement('div');
     replyPreview.classList.add('reply-preview');
-    replyPreview.innerText = `Trả lời ${chat.replyMessage.users?.username}: "${
-      chat.replyMessage.content || ''
-    }"`;
+    replyPreview.innerText = `Trả lời ${chat.replyMessage.users.username}: "${chat.replyMessage.content}"`;
     bubble.appendChild(replyPreview);
   }
+  
+  
 
   if (chat.imageUrl) {
     const img = document.createElement('img');

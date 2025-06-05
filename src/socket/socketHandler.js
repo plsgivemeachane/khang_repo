@@ -195,23 +195,23 @@ module.exports = function (io) {
     socket.on('stop-typing', ({ roomId }) => {
       socket.to(roomId).emit('stop-typing');
     });
-    socket.on('delete-message', async ({ chatId, roomId }) => {
-      const room = await db.Room.findOne({ where: { roomId } });
-      if (!room) return;
+socket.on('delete-message', async ({ chatId, roomId }) => {
+  const room = await db.Room.findOne({ where: { roomId } });
+  if (!room) return;
 
-      // Emit xóa tin chính
-      io.to(roomId).emit('message-deleted', { chatId });
+  // Emit xóa tin chính
+  io.to(roomId).emit('message-deleted', { chatId });
 
-      // Tìm tất cả chat nào đang reply tin bị thu hồi
-      const replyChats = await db.Chat.findAll({
-        where: { replyId: chatId, groupId: room.id },
-      });
+  // Tìm tất cả chat nào đang reply tin bị thu hồi
+  const replyChats = await db.Chat.findAll({
+    where: { replyId: chatId, groupId: room.id },
+  });
 
-      // Emit xóa hoàn toàn cả reply
-      for (const reply of replyChats) {
-        io.to(roomId).emit('force-remove-message', { chatId: reply.id });
-      }
-    });
+  // Emit xóa hoàn toàn cả reply
+  for (const reply of replyChats) {
+    io.to(roomId).emit('force-remove-message', { chatId: reply.id });
+  }
+});
 
     socket.on('disconnect', () => {
       delete onlineUsers[socket.id];
