@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       Payment.belongsTo(models.User, {
         foreignKey: 'userId',
         as: 'user',
-      })
+      });
     }
   }
   Payment.init(
@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       payment_content: DataTypes.STRING,
       status: DataTypes.BOOLEAN,
       payment_value: DataTypes.INTEGER,
+      paymentId: DataTypes.STRING,
     },
     {
       sequelize,

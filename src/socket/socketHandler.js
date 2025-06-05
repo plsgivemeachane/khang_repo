@@ -19,16 +19,20 @@ module.exports = function (io) {
         // Đánh dấu đã đọc các tin nhắn chưa đọc
         const chats = await db.Chat.findAll({
           where: { groupId: room.id },
-          include: [{
-            model: db.ChatRead,
-            as: 'chatReads',
-            where: { userId },
-            required: false,
-          }],
+          include: [
+            {
+              model: db.ChatRead,
+              as: 'chatReads',
+              where: { userId },
+              required: false,
+            },
+          ],
         });
 
-        const unreadChats = chats.filter(chat => !chat.chatReads || chat.chatReads.length === 0);
-        const readRecords = unreadChats.map(chat => ({
+        const unreadChats = chats.filter(
+          (chat) => !chat.chatReads || chat.chatReads.length === 0
+        );
+        const readRecords = unreadChats.map((chat) => ({
           chatId: chat.id,
           userId,
           seenAt: new Date(),
@@ -47,9 +51,9 @@ module.exports = function (io) {
               type: 'message',
               isRead: false,
               data: {
-                roomId: roomId
-              }
-            }
+                roomId: roomId,
+              },
+            },
           }
         );
 
@@ -69,15 +73,19 @@ module.exports = function (io) {
         for (const room of rooms) {
           const chats = await db.Chat.findAll({
             where: { groupId: room.id },
-            include: [{
-              model: db.ChatRead,
-              as: 'chatReads',
-              where: { userId },
-              required: false,
-            }]
+            include: [
+              {
+                model: db.ChatRead,
+                as: 'chatReads',
+                where: { userId },
+                required: false,
+              },
+            ],
           });
 
-          const unreadCount = chats.filter(chat => !chat.chatReads || chat.chatReads.length === 0).length;
+          const unreadCount = chats.filter(
+            (chat) => !chat.chatReads || chat.chatReads.length === 0
+          ).length;
 
           socket.emit('room-unread-count', {
             roomId: room.roomId,
@@ -104,12 +112,16 @@ module.exports = function (io) {
             {
               model: db.Chat,
               as: 'replyMessage',
-              include: [{ model: db.User, as: 'users', attributes: ['username'] }],
+              include: [
+                { model: db.User, as: 'users', attributes: ['username'] },
+              ],
             },
             {
               model: db.ChatRead,
               as: 'chatReads',
-              include: [{ model: db.User, as: 'user', attributes: ['username'] }],
+              include: [
+                { model: db.User, as: 'user', attributes: ['username'] },
+              ],
             },
           ],
         });
@@ -140,7 +152,9 @@ module.exports = function (io) {
         io.to(roomId).emit('new-chat', {
           chat: {
             ...latestChat.toJSON(),
-            chatReads: seenUsernames.map(username => ({ user: { username } })),
+            chatReads: seenUsernames.map((username) => ({
+              user: { username },
+            })),
           },
         });
 
@@ -151,7 +165,7 @@ module.exports = function (io) {
           if (parseInt(memberId) === parseInt(userId)) continue;
 
           const isInRoom = Object.values(onlineUsers).some(
-            u => u.userId === memberId && u.roomId === roomId
+            (u) => u.userId === memberId && u.roomId === roomId
           );
 
           if (!isInRoom) {
@@ -169,13 +183,34 @@ module.exports = function (io) {
             });
           }
         }
-
       } catch (err) {
         console.error('❌ Error in send-message:', err);
       }
     });
-    socket.on('delete-message', ({ chatId, roomId }) => {
-      socket.to(roomId).emit('message-deleted', { chatId });
+    socket.on('typing', async ({ roomId, userId }) => {
+      const user = await db.User.findByPk(userId);
+      socket.to(roomId).emit('typing', { username: user?.username });
+    });
+
+    socket.on('stop-typing', ({ roomId }) => {
+      socket.to(roomId).emit('stop-typing');
+    });
+    socket.on('delete-message', async ({ chatId, roomId }) => {
+      const room = await db.Room.findOne({ where: { roomId } });
+      if (!room) return;
+
+      // Emit xóa tin chính
+      io.to(roomId).emit('message-deleted', { chatId });
+
+      // Tìm tất cả chat nào đang reply tin bị thu hồi
+      const replyChats = await db.Chat.findAll({
+        where: { replyId: chatId, groupId: room.id },
+      });
+
+      // Emit xóa hoàn toàn cả reply
+      for (const reply of replyChats) {
+        io.to(roomId).emit('force-remove-message', { chatId: reply.id });
+      }
     });
 
     socket.on('disconnect', () => {
