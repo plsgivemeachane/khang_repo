@@ -112,15 +112,29 @@ module.exports = function (io) {
             {
               model: db.Chat,
               as: 'replyMessage',
+              required: false,
+              where: {
+                content: {
+                  [db.Sequelize.Op.ne]: null,
+                },
+              },
               include: [
-                { model: db.User, as: 'users', attributes: ['username'] },
+                {
+                  model: db.User,
+                  as: 'users',
+                  attributes: ['username'],
+                },
               ],
             },
             {
               model: db.ChatRead,
               as: 'chatReads',
               include: [
-                { model: db.User, as: 'user', attributes: ['username'] },
+                {
+                  model: db.User,
+                  as: 'user',
+                  attributes: ['username'],
+                },
               ],
             },
           ],
@@ -195,23 +209,38 @@ module.exports = function (io) {
     socket.on('stop-typing', ({ roomId }) => {
       socket.to(roomId).emit('stop-typing');
     });
-socket.on('delete-message', async ({ chatId, roomId }) => {
-  const room = await db.Room.findOne({ where: { roomId } });
-  if (!room) return;
-
-  // Emit xóa tin chính
-  io.to(roomId).emit('message-deleted', { chatId });
-
-  // Tìm tất cả chat nào đang reply tin bị thu hồi
-  const replyChats = await db.Chat.findAll({
-    where: { replyId: chatId, groupId: room.id },
-  });
-
-  // Emit xóa hoàn toàn cả reply
-  for (const reply of replyChats) {
-    io.to(roomId).emit('force-remove-message', { chatId: reply.id });
-  }
-});
+    socket.on('delete-message', async ({ chatId, roomId }) => {
+      const room = await db.Room.findOne({ where: { roomId } });
+      if (!room) return;
+    
+      const chatIdNumber = Number(chatId);
+    
+      // ✅ 1. Thu hồi tin chính
+      await db.Chat.update(
+        { content: null, imageUrl: null },
+        { where: { id: chatIdNumber } }
+      );
+    
+      // ✅ 2. Gửi về client để xoá tin chính
+      io.to(roomId).emit('message-deleted', { chatId: chatIdNumber });
+    
+      // ✅ 3. Tìm các tin rep tin này
+      const replyChats = await db.Chat.findAll({
+        where: { replyId: chatIdNumber, groupId: room.id }
+      });
+    
+      // ✅ 4. Set replyId về null (gỡ liên kết)
+      await db.Chat.update(
+        { replyId: null },
+        { where: { replyId: chatIdNumber, groupId: room.id } }
+      );
+    
+      // ✅ 5. Gửi về client để cập nhật UI xóa đoạn reply preview
+      for (const reply of replyChats) {
+        io.to(roomId).emit('reply-preview-remove', { chatId: reply.id });
+      }
+    });
+    
 
     socket.on('disconnect', () => {
       delete onlineUsers[socket.id];

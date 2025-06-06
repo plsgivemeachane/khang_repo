@@ -52,6 +52,13 @@ socket.on('force-remove-message', ({ chatId }) => {
     msg.remove(); // ← đoạn này đúng
   }
 });
+socket.on('reply-preview-remove', ({ chatId }) => {
+  const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
+  if (msg) {
+    const preview = msg.querySelector('.reply-preview');
+    if (preview) preview.remove();
+  }
+});
 
 // ======= CLICK HÀNH ĐỘNG =======
 document.addEventListener('click', async (e) => {
@@ -187,13 +194,18 @@ function renderChat(chat, isPrepend = false, target = messagesEl) {
 
   const bubble = document.createElement('div');
   bubble.classList.add('bubble');
-  if (chat.replyMessage && chat.replyMessage.content && chat.replyMessage.users?.username) {
+  if (
+    chat.replyId &&
+    chat.replyMessage &&
+    chat.replyMessage.users?.username &&
+    typeof chat.replyMessage.content === 'string' &&
+    chat.replyMessage.content.trim() !== ''
+  ) {
     const replyPreview = document.createElement('div');
     replyPreview.classList.add('reply-preview');
     replyPreview.innerText = `Trả lời ${chat.replyMessage.users.username}: "${chat.replyMessage.content}"`;
     bubble.appendChild(replyPreview);
   }
-  
   
 
   if (chat.imageUrl) {
