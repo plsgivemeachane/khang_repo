@@ -6,34 +6,77 @@ const input = document.getElementById('messageInput');
 const imageInput = document.getElementById('imageInput');
 const replyToUserSpan = document.getElementById('replyToUser');
 const replyToContentSpan = document.getElementById('replyToContent');
+const typingEl = document.getElementById('typingIndicator'); // <== add this div in HTML
+let typingTimeout = null;
 
 let replyId = null;
 let offset = 0;
 const limit = 10;
 let isLoading = false;
 
-// 📌 Khi click nút xóa
+// ======= TYPING INDICATOR =======
+input.addEventListener('input', () => {
+  socket.emit('typing', { roomId: window.roomId, userId: window.userId });
+
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    socket.emit('stop-typing', {
+      roomId: window.roomId,
+      userId: window.userId,
+    });
+  }, 2000);
+});
+
+socket.on('typing', ({ username }) => {
+  typingEl.style.display = 'block';
+});
+
+socket.on('stop-typing', () => {
+  typingEl.style.display = 'none';
+});
+
+// ======= REALTIME XÓA TIN NHẮN =======
+// Nhận sự kiện xóa thu hồi chính
+socket.on('message-deleted', ({ chatId }) => {
+  const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
+  if (msg) {
+    msg.remove(); // Xóa hẳn luôn thay vì ghi "Tin nhắn đã được thu hồi"
+  }
+});
+
+// Nhận sự kiện xóa hoàn toàn reply
+// Khi server yêu cầu xóa hẳn tin nhắn (reply)
+socket.on('force-remove-message', ({ chatId }) => {
+  const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
+  if (msg) {
+    msg.remove(); // ← đoạn này đúng
+  }
+});
+socket.on('reply-preview-remove', ({ chatId }) => {
+  const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
+  if (msg) {
+    const preview = msg.querySelector('.reply-preview');
+    if (preview) preview.remove();
+  }
+});
+
+// ======= CLICK HÀNH ĐỘNG =======
 document.addEventListener('click', async (e) => {
   if (e.target.closest('.delete-btn')) {
     const btn = e.target.closest('.delete-btn');
     const chatId = btn.dataset.id;
     if (confirm('Xóa tin nhắn này?')) {
       await fetch(`/api/chat/delete/${chatId}`, { method: 'DELETE' });
-      btn.closest('.chat-message')?.remove();
 
-      // ✅ Gửi socket để cập nhật cho người khác
+      const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
+      if (msg) msg.remove();
+
       socket.emit('delete-message', {
         chatId,
         roomId: window.roomId,
       });
     }
   }
-
-  // 📌 Lắng nghe tin nhắn bị xóa từ server
-  socket.on('message-deleted', ({ chatId }) => {
-    const msg = document.querySelector(`.chat-message[data-id="${chatId}"]`);
-    if (msg) msg.remove();
-  });
 
   if (e.target.closest('.reply-btn')) {
     const chat = e.target.closest('.chat-message');
@@ -70,7 +113,6 @@ async function sendMessage() {
   if (replyId) formData.append('replyId', replyId);
   if (file) formData.append('image', file);
 
-  // Gửi đến server
   const res = await fetch('/api/chat/send-chat', {
     method: 'POST',
     body: formData,
@@ -89,13 +131,11 @@ async function sendMessage() {
   clearReply();
 }
 
-// Nhận realtime tin nhắn mới (từ socket)
 socket.on('new-chat', ({ chat }) => {
   renderChat(chat, false);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 });
 
-// Realtime cập nhật người đã xem
 socket.on('message-seen-update', ({ chatId, seenUsers }) => {
   const wrapper = document.querySelector(`.chat-message[data-id="${chatId}"]`);
   if (!wrapper || !Array.isArray(seenUsers)) return;
@@ -118,7 +158,6 @@ socket.on('message-seen-update', ({ chatId, seenUsers }) => {
     seenUsers.join(', ');
 });
 
-// Hàm load tin nhắn cũ
 async function loadChats(isPrepend = false) {
   if (isLoading) return;
   isLoading = true;
@@ -155,15 +194,19 @@ function renderChat(chat, isPrepend = false, target = messagesEl) {
 
   const bubble = document.createElement('div');
   bubble.classList.add('bubble');
-
-  if (chat.replyMessage) {
+  if (
+    chat.replyId &&
+    chat.replyMessage &&
+    chat.replyMessage.users?.username &&
+    typeof chat.replyMessage.content === 'string' &&
+    chat.replyMessage.content.trim() !== ''
+  ) {
     const replyPreview = document.createElement('div');
     replyPreview.classList.add('reply-preview');
-    replyPreview.innerText = `Trả lời ${chat.replyMessage.users?.username}: "${
-      chat.replyMessage.content || ''
-    }"`;
+    replyPreview.innerText = `Trả lời ${chat.replyMessage.users.username}: "${chat.replyMessage.content}"`;
     bubble.appendChild(replyPreview);
   }
+  
 
   if (chat.imageUrl) {
     const img = document.createElement('img');
@@ -183,7 +226,6 @@ function renderChat(chat, isPrepend = false, target = messagesEl) {
   sender.className = 'small text-muted';
   sender.innerText = chat.users?.username || '';
   wrapper.appendChild(sender);
-
   wrapper.appendChild(bubble);
 
   const actions = document.createElement('div');

@@ -24,10 +24,14 @@ module.exports = {
         type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.BOOLEAN,
+      type: Sequelize.BOOLEAN,
       },
       payment_value: {
         type: Sequelize.INTEGER,
+      },
+      paymentId: {
+        type: Sequelize.STRING,
+        
       },
 
       createdAt: {
