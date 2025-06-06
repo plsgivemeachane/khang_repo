@@ -27,7 +27,7 @@ jobs:
           rsync -az -e  "ssh -i ~/.ssh/id_ed25519" ./ root@38.247.64.73:/root/khang
       - name: Sync NON-IMPORTANT file (AKA source code) require delete actions
         run: |
-          rsync -az -e --delete  "ssh -i ~/.ssh/id_ed25519" ./src root@38.247.64.73:/root/khang/src
+          rsync -az --delete -e "ssh -i ~/.ssh/id_ed25519" ./src root@38.247.64.73:/root/khang/src
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
