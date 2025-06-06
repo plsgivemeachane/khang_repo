@@ -22,9 +22,12 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H 38.247.64.73 >> ~/.ssh/known_hosts
 
-      - name: Sync files to server via rsync
+      - name: Sync IMPORTANTS files to server via rsync
         run: |
-          rsync -az -e "ssh -i ~/.ssh/id_ed25519" ./ root@38.247.64.73:/root/khang
+          rsync -az -e  "ssh -i ~/.ssh/id_ed25519" ./ root@38.247.64.73:/root/khang
+      - name: Sync NON-IMPORTANT file (AKA source code) require delete actions
+        run: |
+          rsync -az -e --delete  "ssh -i ~/.ssh/id_ed25519" ./src root@38.247.64.73:/root/khang/src
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
